@@ -68,6 +68,7 @@
         // YOUR LAMBDA URLs
         const CHECK_STATUS_URL = 'https://3erbngd2ne5pcg2vcjrzb2hrjq0bnjhn.lambda-url.us-east-1.on.aws/';
         const GENERATE_SRJ_URL = 'https://fwe3c5khbsp6tdsurvvfsefme40aevnx.lambda-url.us-east-1.on.aws/';
+        const SAVE_LOG_URL = 'https://3n6sennmgib2fc24fz3ynbm5u40zekrs.lambda-url.us-east-1.on.aws/';
         
         let currentStudentId = null;
 
@@ -189,7 +190,7 @@
             }
         }
 
-        // Function to save daily log (Mock version for now)
+        // Function to save daily log to DynamoDB
         async function saveDailyLog() {
             const week = document.getElementById('weekNumber').value;
             const day = document.getElementById('dayNumber').value;
@@ -211,7 +212,6 @@
             for (let i = 0; i < 4; i++) {
                 const checkbox = document.getElementById(`checklist-${i}`);
                 if (checkbox) {
-                    // Get the text of the label that contains the checkbox
                     const itemText = checkbox.parentElement.textContent.trim();
                     checklistResponses.push({
                         item: itemText,
@@ -223,7 +223,6 @@
             // Prepare data to save
             const logData = {
                 student_id: currentStudentId,
-                log_date: `${new Date().toISOString().split('T')[0]}-week${week}-day${day}`,
                 week: parseInt(week),
                 day: parseInt(day),
                 srj_answers: srjAnswers,
@@ -235,16 +234,25 @@
             statusDiv.innerHTML = '<p>⏳ Saving...</p>';
             
             try {
-                // MOCK SAVE: We will connect this to DynamoDB in the next step!
-                console.log("Data ready to save:", logData);
+                // Call the save-daily-log Lambda function
+                const response = await fetch(SAVE_LOG_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(logData)
+                });
                 
-                setTimeout(() => {
-                    statusDiv.innerHTML = '<p style="color:green; font-weight:bold;">✅ Daily log saved successfully! (Mock save)</p>';
-                    alert('Great job! Your daily SRJ has been saved locally. In the next step, we will connect this to the DynamoDB database!');
-                }, 1000);
+                const result = await response.json();
+                
+                if (response.ok) {
+                    statusDiv.innerHTML = '<p style="color:green; font-weight:bold;">✅ Daily log saved to database!</p>';
+                    alert('Excellent work! Your daily SRJ has been saved to the database. Keep it up!');
+                } else {
+                    statusDiv.innerHTML = '<p style="color:red;">❌ Error: ' + (result.error || 'Failed to save') + '</p>';
+                }
                 
             } catch (error) {
                 statusDiv.innerHTML = '<p style="color:red;">❌ Error saving. Please try again.</p>';
+                console.error('Error:', error);
             }
         }
     </script>
