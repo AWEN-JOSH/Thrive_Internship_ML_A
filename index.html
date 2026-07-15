@@ -12,7 +12,7 @@
         h2 { color: #232f3e; border-bottom: 2px solid #ff9900; padding-bottom: 10px; }
         button { background-color: #ff9900; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 10px 5px; }
         button:hover { background-color: #e68a00; }
-        input, select { padding: 10px; width: 100%; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        input, select, textarea { padding: 10px; width: 100%; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-family: Arial, sans-serif; }
         .result { margin-top: 20px; padding: 15px; border-radius: 5px; display: none; }
         .success { background: #e2f0d9; border-left: 5px solid #4CAF50; color: #2e7d32; }
         .error { background: #fdecea; border-left: 5px solid #f44336; color: #c62828; }
@@ -147,32 +147,37 @@
                 if (response.ok) {
                     resultBox.className = 'result success';
                     
-                    // Build the SRJ display
+                    // Build the SRJ display with INPUT FIELDS
                     let html = `<h3>📚 Week ${week}, Day ${day} - SRJ & Observation Checklist</h3>`;
                     html += `<p><strong>Student:</strong> Year ${data.student_year}, Semester ${data.student_semester}</p>`;
-                    
-                    // Display SRJ Questions
-                    html += `<div class="srj-item"><h4>📝 Student Reflective Journal Questions:</h4>`;
+
+                    // Display SRJ Questions with TEXT AREAS for answers
+                    html += `<div class="srj-item"><h4>📝 Student Reflective Journal - Your Answers:</h4>`;
                     if (Array.isArray(data.srj_questions)) {
                         data.srj_questions.forEach((q, index) => {
                             html += `<div class="srj-question">${index + 1}. ${q}</div>`;
+                            html += `<textarea id="srj-answer-${index}" rows="4" placeholder="Type your reflection here..." style="width:100%; margin-bottom:15px; padding:10px; border:1px solid #ccc; border-radius:5px;"></textarea>`;
                         });
                     } else {
                         html += `<div>${data.srj_questions}</div>`;
                     }
                     html += `</div>`;
-                    
-                    // Display Checklist
+
+                    // Display Checklist with CHECKBOXES
                     html += `<div class="srj-item"><h4>✅ Observation Checklist:</h4>`;
                     if (Array.isArray(data.checklist)) {
                         data.checklist.forEach((item, index) => {
-                            html += `<div class="checklist-item">☐ ${item}</div>`;
+                            html += `<div style="margin:10px 0;"><label><input type="checkbox" id="checklist-${index}" style="margin-right:10px;"> ${item}</label></div>`;
                         });
                     } else {
                         html += `<div>${data.checklist}</div>`;
                     }
                     html += `</div>`;
-                    
+
+                    // Add SAVE button
+                    html += `<button onclick="saveDailyLog()" style="margin-top:20px; background-color:#28a745;">💾 Save My Daily Log</button>`;
+                    html += `<div id="saveStatus" style="margin-top:10px;"></div>`;
+
                     resultBox.innerHTML = html;
                 } else {
                     resultBox.className = 'result error';
@@ -181,6 +186,65 @@
             } catch (error) {
                 resultBox.className = 'result error';
                 resultBox.innerHTML = `<h3>🔌 Connection Error</h3><p>${error.message}</p>`;
+            }
+        }
+
+        // Function to save daily log (Mock version for now)
+        async function saveDailyLog() {
+            const week = document.getElementById('weekNumber').value;
+            const day = document.getElementById('dayNumber').value;
+            
+            // Collect SRJ answers
+            const srjAnswers = [];
+            for (let i = 0; i < 3; i++) {
+                const answerElement = document.getElementById(`srj-answer-${i}`);
+                if (answerElement && answerElement.value.trim() !== '') {
+                    srjAnswers.push({
+                        question_number: i + 1,
+                        answer: answerElement.value.trim()
+                    });
+                }
+            }
+            
+            // Collect checklist responses
+            const checklistResponses = [];
+            for (let i = 0; i < 4; i++) {
+                const checkbox = document.getElementById(`checklist-${i}`);
+                if (checkbox) {
+                    // Get the text of the label that contains the checkbox
+                    const itemText = checkbox.parentElement.textContent.trim();
+                    checklistResponses.push({
+                        item: itemText,
+                        completed: checkbox.checked
+                    });
+                }
+            }
+            
+            // Prepare data to save
+            const logData = {
+                student_id: currentStudentId,
+                log_date: `${new Date().toISOString().split('T')[0]}-week${week}-day${day}`,
+                week: parseInt(week),
+                day: parseInt(day),
+                srj_answers: srjAnswers,
+                checklist: checklistResponses,
+                timestamp: new Date().toISOString()
+            };
+            
+            const statusDiv = document.getElementById('saveStatus');
+            statusDiv.innerHTML = '<p>⏳ Saving...</p>';
+            
+            try {
+                // MOCK SAVE: We will connect this to DynamoDB in the next step!
+                console.log("Data ready to save:", logData);
+                
+                setTimeout(() => {
+                    statusDiv.innerHTML = '<p style="color:green; font-weight:bold;">✅ Daily log saved successfully! (Mock save)</p>';
+                    alert('Great job! Your daily SRJ has been saved locally. In the next step, we will connect this to the DynamoDB database!');
+                }, 1000);
+                
+            } catch (error) {
+                statusDiv.innerHTML = '<p style="color:red;">❌ Error saving. Please try again.</p>';
             }
         }
     </script>
