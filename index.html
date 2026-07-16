@@ -7,13 +7,14 @@
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f7f6; }
         .header { background-color: #232f3e; color: white; padding: 20px; text-align: center; }
-        .container { max-width: 900px; margin: 30px auto; padding: 20px; }
+        .container { max-width: 1000px; margin: 30px auto; padding: 20px; }
         .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
         h2 { color: #232f3e; border-bottom: 2px solid #ff9900; padding-bottom: 10px; margin-top: 0; }
         h3 { color: #ff9900; margin-top: 25px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
         button { background-color: #ff9900; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 10px 5px; }
         button:hover { background-color: #e68a00; }
         button.secondary { background-color: #232f3e; }
+        button.large { width: 100%; margin-top: 20px; font-size: 18px; padding: 15px; }
         input, select, textarea { padding: 10px; width: 100%; margin: 8px 0 15px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-family: Arial, sans-serif; }
         label { font-weight: bold; font-size: 14px; color: #333; }
         .result { margin-top: 20px; padding: 15px; border-radius: 5px; display: none; }
@@ -25,6 +26,20 @@
         .class-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; background: #f9f9f9; padding: 10px; border-radius: 5px; }
         .class-row input, .class-row select { margin: 0; flex: 1; }
         .class-row .remove-btn { background: #f44336; padding: 10px; min-width: 40px; margin: 0; }
+        
+        /* Report Styles */
+        #reportDisplay { margin-top: 20px; padding: 30px; background: white; border: 2px solid #232f3e; border-radius: 8px; display: none; }
+        #reportDisplay h1 { color: #232f3e; text-align: center; border-bottom: 3px solid #ff9900; padding-bottom: 15px; }
+        #reportDisplay h2 { color: #ff9900; border-bottom: 2px solid #232f3e; margin-top: 30px; }
+        #reportDisplay h3 { color: #232f3e; border-bottom: 1px solid #ccc; }
+        #reportDisplay p { line-height: 1.6; margin: 15px 0; text-align: justify; }
+        #reportDisplay ul, #reportDisplay ol { margin: 15px 0; padding-left: 30px; }
+        #reportDisplay li { margin: 8px 0; line-height: 1.5; }
+        
+        @media print {
+            .no-print { display: none !important; }
+            #reportDisplay { border: none; box-shadow: none; }
+        }
     </style>
 </head>
 <body>
@@ -35,7 +50,7 @@
 
     <div class="container">
         <!-- My Profile Section -->
-        <div class="card">
+        <div class="card no-print">
             <h2>My Profile (QR Status)</h2>
             <input type="text" id="studentIdInput" placeholder="Enter Student ID (e.g., Kwame Mensah)">
             <button onclick="checkStudentStatus()">Check My Status</button>
@@ -43,59 +58,55 @@
         </div>
 
         <!-- School Profile Section -->
-        <div class="card" id="schoolProfileSection" style="display:none;">
+        <div class="card no-print" id="schoolProfileSection" style="display:none;">
             <h2>Comprehensive School Profile</h2>
             <p>Fill in the details of your practice school for Chapter 2 of your report.</p>
             
-            <form id="schoolProfileForm">
-                <h3>1. Basic Information</h3>
-                <input type="text" id="school_name" placeholder="School Name" required>
-                <input type="text" id="school_location" placeholder="Location (Town, District, Region)" required>
-                <select id="school_type">
-                    <option value="Basic School (Creche to JHS)">Basic School (Creche to JHS)</option>
-                    <option value="Primary School Only">Primary School Only</option>
-                    <option value="JHS Only">JHS Only</option>
-                </select>
-                <textarea id="school_history" rows="3" placeholder="Brief History of the School"></textarea>
-                <textarea id="mission_statement" rows="2" placeholder="Mission Statement"></textarea>
-                <textarea id="vision_statement" rows="2" placeholder="Vision Statement"></textarea>
-                <textarea id="core_values" rows="2" placeholder="Core Values (comma separated)"></textarea>
+            <h3>1. Basic Information</h3>
+            <input type="text" id="school_name" placeholder="School Name" required>
+            <input type="text" id="school_location" placeholder="Location (Town, District, Region)" required>
+            <select id="school_type">
+                <option value="Basic School (Creche to JHS)">Basic School (Creche to JHS)</option>
+                <option value="Primary School Only">Primary School Only</option>
+                <option value="JHS Only">JHS Only</option>
+            </select>
+            <textarea id="school_history" rows="3" placeholder="Brief History of the School"></textarea>
+            <textarea id="mission_statement" rows="2" placeholder="Mission Statement"></textarea>
+            <textarea id="vision_statement" rows="2" placeholder="Vision Statement"></textarea>
+            <textarea id="core_values" rows="2" placeholder="Core Values (comma separated)"></textarea>
 
-                <h3>2. Teaching Staff Breakdown</h3>
-                <div class="form-row">
-                    <div class="form-col"><label>Male Professional</label><input type="number" id="ts_male_prof" value="0"></div>
-                    <div class="form-col"><label>Female Professional</label><input type="number" id="ts_female_prof" value="0"></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-col"><label>Male Pupil Teachers</label><input type="number" id="ts_male_pupil" value="0"></div>
-                    <div class="form-col"><label>Female Pupil Teachers</label><input type="number" id="ts_female_pupil" value="0"></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-col"><label>Male Nat. Service</label><input type="number" id="ts_male_ns" value="0"></div>
-                    <div class="form-col"><label>Female Nat. Service</label><input type="number" id="ts_female_ns" value="0"></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-col"><label>Non-Teaching Staff (Total)</label><input type="number" id="non_teaching" value="0"></div>
-                </div>
+            <h3>2. Teaching Staff Breakdown</h3>
+            <div class="form-row">
+                <div class="form-col"><label>Male Professional</label><input type="number" id="ts_male_prof" value="0"></div>
+                <div class="form-col"><label>Female Professional</label><input type="number" id="ts_female_prof" value="0"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-col"><label>Male Pupil Teachers</label><input type="number" id="ts_male_pupil" value="0"></div>
+                <div class="form-col"><label>Female Pupil Teachers</label><input type="number" id="ts_female_pupil" value="0"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-col"><label>Male Nat. Service</label><input type="number" id="ts_male_ns" value="0"></div>
+                <div class="form-col"><label>Female Nat. Service</label><input type="number" id="ts_female_ns" value="0"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-col"><label>Non-Teaching Staff (Total)</label><input type="number" id="non_teaching" value="0"></div>
+            </div>
 
-                <h3>3. Student Enrollment (By Class & Gender)</h3>
-                <div id="enrollmentContainer">
-                    <!-- Classes will be added here by JavaScript -->
-                </div>
-                <button type="button" class="secondary" onclick="addClassRow()">+ Add Another Class/Stream</button>
+            <h3>3. Student Enrollment (By Class & Gender)</h3>
+            <div id="enrollmentContainer"></div>
+            <button type="button" class="secondary" onclick="addClassRow()">+ Add Another Class/Stream</button>
 
-                <h3>4. School Governance & Philosophy</h3>
-                <textarea id="stakeholders" rows="3" placeholder="Key Stakeholders (e.g., PTA, SMC, Traditional Council, GES)"></textarea>
-                <textarea id="class_rules" rows="4" placeholder="List of School/Class Rules and Regulations"></textarea>
-                <textarea id="teaching_philosophy" rows="4" placeholder="Your Personal Teaching Philosophy as a Trainee"></textarea>
+            <h3>4. School Governance & Philosophy</h3>
+            <textarea id="stakeholders" rows="3" placeholder="Key Stakeholders (e.g., PTA, SMC, Traditional Council, GES)"></textarea>
+            <textarea id="class_rules" rows="4" placeholder="List of School/Class Rules and Regulations"></textarea>
+            <textarea id="teaching_philosophy" rows="4" placeholder="Your Personal Teaching Philosophy as a Trainee"></textarea>
 
-                <button type="button" onclick="saveSchoolProfile()" style="width:100%; margin-top:20px; font-size:18px;">💾 Save School Profile</button>
-                <div id="schoolSaveStatus" class="result"></div>
-            </form>
+            <button type="button" onclick="saveSchoolProfile()" class="large">💾 Save School Profile</button>
+            <div id="schoolSaveStatus" class="result"></div>
         </div>
 
         <!-- Daily SRJ Log Section -->
-        <div class="card" id="srjSection" style="display:none;">
+        <div class="card no-print" id="srjSection" style="display:none;">
             <h2>Daily SRJ Log</h2>
             <div class="form-row">
                 <div class="form-col"><label>Week (1-6)</label><input type="number" id="weekNumber" min="1" max="6" value="1"></div>
@@ -103,6 +114,27 @@
             </div>
             <button onclick="generateDailySRJ()">Generate Daily SRJ</button>
             <div id="srjResult" class="result"></div>
+        </div>
+
+        <!-- Generate Final Report Section -->
+        <div class="card no-print" id="reportSection" style="display:none;">
+            <h2>🎓 Generate Final Internship Report</h2>
+            <p>Click the button below to generate your comprehensive 5-Chapter internship report using AI.</p>
+            <p style="background: #fff3cd; padding: 15px; border-left: 5px solid #ff9900; border-radius: 5px;">
+                <strong>Note:</strong> This will analyze all your saved data (School Profile + Daily Logs) and generate a professional academic report.
+            </p>
+            <button onclick="generateFinalReport()" class="large" style="background-color: #28a745; font-size: 20px;">📄 Generate Complete Report</button>
+            <div id="reportStatus" class="result"></div>
+        </div>
+
+        <!-- Report Display Section -->
+        <div id="reportDisplay">
+            <div class="no-print" style="text-align: right; margin-bottom: 20px;">
+                <button onclick="window.print()" style="background: #232f3e;">🖨️ Print Report</button>
+                <button onclick="downloadReport()" style="background: #28a745;">💾 Download as HTML</button>
+                <button onclick="document.getElementById('reportDisplay').style.display='none'" style="background: #f44336;">Close</button>
+            </div>
+            <div id="reportContent"></div>
         </div>
     </div>
 
@@ -112,6 +144,7 @@
         const GENERATE_SRJ_URL = 'https://fwe3c5khbsp6tdsurvvfsefme40aevnx.lambda-url.us-east-1.on.aws/';
         const SAVE_LOG_URL = 'https://3n6sennmgib2fc24fz3ynbm5u40zekrs.lambda-url.us-east-1.on.aws/';
         const SAVE_SCHOOL_URL = 'https://4clxwpc6j7hnty44gxusrqvwnu0mqiwl.lambda-url.us-east-1.on.aws/';
+        const GENERATE_REPORT_URL = 'https://c746jcx5oxzbwwdct2xmsfy5540cfafy.lambda-url.us-east-1.on.aws/';
 
         let currentStudentId = null;
 
@@ -167,6 +200,7 @@
                     resultBox.innerHTML = `<h3>✅ ${data.message}</h3><p>Name: ${data.student_name} | School: ${data.school_id}</p>`;
                     document.getElementById('schoolProfileSection').style.display = 'block';
                     document.getElementById('srjSection').style.display = 'block';
+                    document.getElementById('reportSection').style.display = 'block';
                 } else {
                     resultBox.className = 'result error';
                     resultBox.innerHTML = `<h3>❌ ${data.message}</h3>`;
@@ -283,7 +317,7 @@
                     }
                     html += `</div>`;
                     
-                    html += `<button onclick="saveDailyLog(${week}, ${day})" style="background:#28a745">💾 Save Log</button><div id="logStatus"></div>`;
+                    html += `<button onclick="saveDailyLog(${week}, ${day})" style="background:#28a745"> Save Log</button><div id="logStatus"></div>`;
                     resultBox.innerHTML = html;
                 } else {
                     resultBox.className = 'result error';
@@ -332,6 +366,84 @@
             } catch(e) {
                 statusDiv.innerHTML = '<span style="color:red">Connection Error</span>';
             }
+        }
+
+        async function generateFinalReport() {
+            if (!currentStudentId) { alert('Check status first!'); return; }
+            
+            const statusDiv = document.getElementById('reportStatus');
+            const reportDisplay = document.getElementById('reportDisplay');
+            const reportContent = document.getElementById('reportContent');
+            
+            statusDiv.style.display = 'block';
+            statusDiv.className = 'result loading';
+            statusDiv.innerHTML = '<h3>🤖 AI is generating your comprehensive report...</h3><p>This may take 2-3 minutes. Please wait...</p>';
+            
+            try {
+                const response = await fetch(GENERATE_REPORT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ student_id: currentStudentId })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    statusDiv.className = 'result success';
+                    statusDiv.innerHTML = '<h3>✅ Report Generated Successfully!</h3>';
+                    
+                    // Display the report
+                    reportContent.innerHTML = data.report_html;
+                    reportDisplay.style.display = 'block';
+                    
+                    // Scroll to report
+                    reportDisplay.scrollIntoView({ behavior: 'smooth' });
+                    
+                    alert('Your report is ready! You can now print or download it.');
+                } else {
+                    statusDiv.className = 'result error';
+                    statusDiv.innerHTML = `<h3>❌ Error</h3><p>${data.error}</p>`;
+                }
+            } catch (error) {
+                statusDiv.className = 'result error';
+                statusDiv.innerHTML = `<h3> Connection Error</h3><p>${error.message}</p>`;
+            }
+        }
+
+        function downloadReport() {
+            const reportContent = document.getElementById('reportContent').innerHTML;
+            const studentName = currentStudentId.replace(/\s+/g, '_');
+            const timestamp = new Date().toISOString().split('T')[0];
+            
+            const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Internship Report - ${currentStudentId}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+        h1 { color: #232f3e; text-align: center; border-bottom: 3px solid #ff9900; padding-bottom: 15px; }
+        h2 { color: #ff9900; border-bottom: 2px solid #232f3e; margin-top: 30px; }
+        h3 { color: #232f3e; border-bottom: 1px solid #ccc; }
+        p { text-align: justify; margin: 15px 0; }
+        ul, ol { margin: 15px 0; padding-left: 30px; }
+        li { margin: 8px 0; }
+    </style>
+</head>
+<body>
+    ${reportContent}
+</body>
+</html>`;
+            
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Internship_Report_${studentName}_${timestamp}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
     </script>
 </body>
