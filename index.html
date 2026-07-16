@@ -7,19 +7,24 @@
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f7f6; }
         .header { background-color: #232f3e; color: white; padding: 20px; text-align: center; }
-        .container { max-width: 800px; margin: 30px auto; padding: 20px; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        h2 { color: #232f3e; border-bottom: 2px solid #ff9900; padding-bottom: 10px; }
+        .container { max-width: 900px; margin: 30px auto; padding: 20px; }
+        .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h2 { color: #232f3e; border-bottom: 2px solid #ff9900; padding-bottom: 10px; margin-top: 0; }
+        h3 { color: #ff9900; margin-top: 25px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
         button { background-color: #ff9900; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 10px 5px; }
         button:hover { background-color: #e68a00; }
-        input, select, textarea { padding: 10px; width: 100%; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-family: Arial, sans-serif; }
+        button.secondary { background-color: #232f3e; }
+        input, select, textarea { padding: 10px; width: 100%; margin: 8px 0 15px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-family: Arial, sans-serif; }
+        label { font-weight: bold; font-size: 14px; color: #333; }
         .result { margin-top: 20px; padding: 15px; border-radius: 5px; display: none; }
         .success { background: #e2f0d9; border-left: 5px solid #4CAF50; color: #2e7d32; }
         .error { background: #fdecea; border-left: 5px solid #f44336; color: #c62828; }
         .loading { background: #fff3cd; border-left: 5px solid #ffc107; color: #856404; }
-        .srj-item { margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px; }
-        .srj-question { font-weight: bold; margin-bottom: 10px; color: #232f3e; }
-        .checklist-item { margin: 5px 0; padding-left: 20px; }
+        .form-row { display: flex; gap: 15px; flex-wrap: wrap; }
+        .form-col { flex: 1; min-width: 150px; }
+        .class-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; background: #f9f9f9; padding: 10px; border-radius: 5px; }
+        .class-row input, .class-row select { margin: 0; flex: 1; }
+        .class-row .remove-btn { background: #f44336; padding: 10px; min-width: 40px; margin: 0; }
     </style>
 </head>
 <body>
@@ -29,62 +34,124 @@
     </div>
 
     <div class="container">
-        <!-- My Profile / QR Check Section -->
+        <!-- My Profile Section -->
         <div class="card">
-            <h2>My Profile (QR Status & Placement)</h2>
-            <p>Enter your Student ID to check your access status:</p>
-            <input type="text" id="studentIdInput" placeholder="Enter your Student ID (e.g., Kwame Mensah)">
+            <h2>My Profile (QR Status)</h2>
+            <input type="text" id="studentIdInput" placeholder="Enter Student ID (e.g., Kwame Mensah)">
             <button onclick="checkStudentStatus()">Check My Status</button>
             <div id="profileResult" class="result"></div>
         </div>
 
-        <!-- Daily SRJ Log Section -->
-        <div class="card">
-            <h2>Daily SRJ Log</h2>
-            <p>Generate your daily Student Reflective Journal and Observation Checklist:</p>
+        <!-- School Profile Section -->
+        <div class="card" id="schoolProfileSection" style="display:none;">
+            <h2>Comprehensive School Profile</h2>
+            <p>Fill in the details of your practice school for Chapter 2 of your report.</p>
             
-            <div id="srjInputSection" style="display:none;">
-                <label><strong>Week Number (1-6):</strong></label>
-                <input type="number" id="weekNumber" min="1" max="6" value="1">
-                
-                <label><strong>Day Number (1-5):</strong></label>
-                <input type="number" id="dayNumber" min="1" max="5" value="1">
-                
-                <button onclick="generateDailySRJ()">Generate Daily SRJ</button>
-            </div>
-            
-            <div id="srjResult" class="result"></div>
+            <form id="schoolProfileForm">
+                <h3>1. Basic Information</h3>
+                <input type="text" id="school_name" placeholder="School Name" required>
+                <input type="text" id="school_location" placeholder="Location (Town, District, Region)" required>
+                <select id="school_type">
+                    <option value="Basic School (Creche to JHS)">Basic School (Creche to JHS)</option>
+                    <option value="Primary School Only">Primary School Only</option>
+                    <option value="JHS Only">JHS Only</option>
+                </select>
+                <textarea id="school_history" rows="3" placeholder="Brief History of the School"></textarea>
+                <textarea id="mission_statement" rows="2" placeholder="Mission Statement"></textarea>
+                <textarea id="vision_statement" rows="2" placeholder="Vision Statement"></textarea>
+                <textarea id="core_values" rows="2" placeholder="Core Values (comma separated)"></textarea>
+
+                <h3>2. Teaching Staff Breakdown</h3>
+                <div class="form-row">
+                    <div class="form-col"><label>Male Professional</label><input type="number" id="ts_male_prof" value="0"></div>
+                    <div class="form-col"><label>Female Professional</label><input type="number" id="ts_female_prof" value="0"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-col"><label>Male Pupil Teachers</label><input type="number" id="ts_male_pupil" value="0"></div>
+                    <div class="form-col"><label>Female Pupil Teachers</label><input type="number" id="ts_female_pupil" value="0"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-col"><label>Male Nat. Service</label><input type="number" id="ts_male_ns" value="0"></div>
+                    <div class="form-col"><label>Female Nat. Service</label><input type="number" id="ts_female_ns" value="0"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-col"><label>Non-Teaching Staff (Total)</label><input type="number" id="non_teaching" value="0"></div>
+                </div>
+
+                <h3>3. Student Enrollment (By Class & Gender)</h3>
+                <div id="enrollmentContainer">
+                    <!-- Classes will be added here by JavaScript -->
+                </div>
+                <button type="button" class="secondary" onclick="addClassRow()">+ Add Another Class/Stream</button>
+
+                <h3>4. School Governance & Philosophy</h3>
+                <textarea id="stakeholders" rows="3" placeholder="Key Stakeholders (e.g., PTA, SMC, Traditional Council, GES)"></textarea>
+                <textarea id="class_rules" rows="4" placeholder="List of School/Class Rules and Regulations"></textarea>
+                <textarea id="teaching_philosophy" rows="4" placeholder="Your Personal Teaching Philosophy as a Trainee"></textarea>
+
+                <button type="button" onclick="saveSchoolProfile()" style="width:100%; margin-top:20px; font-size:18px;">💾 Save School Profile</button>
+                <div id="schoolSaveStatus" class="result"></div>
+            </form>
         </div>
 
-        <!-- Other Dashboard Buttons -->
-        <div class="card">
-            <h2>Other Features</h2>
-            <button onclick="alert('School Profile - Coming Soon!')">School Profile</button>
-            <button onclick="alert('Generate Final Report - Coming Soon!')">Generate Report</button>
+        <!-- Daily SRJ Log Section -->
+        <div class="card" id="srjSection" style="display:none;">
+            <h2>Daily SRJ Log</h2>
+            <div class="form-row">
+                <div class="form-col"><label>Week (1-6)</label><input type="number" id="weekNumber" min="1" max="6" value="1"></div>
+                <div class="form-col"><label>Day (1-5)</label><input type="number" id="dayNumber" min="1" max="5" value="1"></div>
+            </div>
+            <button onclick="generateDailySRJ()">Generate Daily SRJ</button>
+            <div id="srjResult" class="result"></div>
         </div>
     </div>
 
     <script>
-        // YOUR LAMBDA URLs
+        // --- LAMBDA URLs ---
         const CHECK_STATUS_URL = 'https://3erbngd2ne5pcg2vcjrzb2hrjq0bnjhn.lambda-url.us-east-1.on.aws/';
         const GENERATE_SRJ_URL = 'https://fwe3c5khbsp6tdsurvvfsefme40aevnx.lambda-url.us-east-1.on.aws/';
         const SAVE_LOG_URL = 'https://3n6sennmgib2fc24fz3ynbm5u40zekrs.lambda-url.us-east-1.on.aws/';
-        
+        const SAVE_SCHOOL_URL = 'https://4clxwpc6j7hnty44gxusrqvwnu0mqiwl.lambda-url.us-east-1.on.aws/';
+
         let currentStudentId = null;
 
-        // Function to check student status
+        const defaultClasses = [
+            "Creche", "KG 1", "KG 2", 
+            "Primary 1", "Primary 2", "Primary 3", "Primary 4", "Primary 5", "Primary 6", 
+            "JHS 1", "JHS 2", "JHS 3"
+        ];
+
+        function addClassRow(className = "", stream = "None", male = 0, female = 0) {
+            const container = document.getElementById('enrollmentContainer');
+            const div = document.createElement('div');
+            div.className = 'class-row';
+            div.innerHTML = `
+                <input type="text" placeholder="Class Name" class="cls-name" value="${className}">
+                <select class="cls-stream">
+                    <option value="None" ${stream === 'None' ? 'selected' : ''}>No Stream</option>
+                    <option value="A" ${stream === 'A' ? 'selected' : ''}>Stream A</option>
+                    <option value="B" ${stream === 'B' ? 'selected' : ''}>Stream B</option>
+                    <option value="C" ${stream === 'C' ? 'selected' : ''}>Stream C</option>
+                </select>
+                <input type="number" placeholder="Male" class="cls-male" value="${male}" min="0">
+                <input type="number" placeholder="Female" class="cls-female" value="${female}" min="0">
+                <button type="button" class="remove-btn" onclick="this.parentElement.remove()">X</button>
+            `;
+            container.appendChild(div);
+        }
+
+        window.onload = function() {
+            defaultClasses.forEach(cls => addClassRow(cls));
+        };
+
         async function checkStudentStatus() {
             const studentId = document.getElementById('studentIdInput').value;
             const resultBox = document.getElementById('profileResult');
-            
-            if (!studentId) {
-                alert('Please enter your Student ID');
-                return;
-            }
+            if (!studentId) { alert('Please enter Student ID'); return; }
 
             resultBox.style.display = 'block';
             resultBox.className = 'result loading';
-            resultBox.innerHTML = '<p>⏳ Checking your status...</p>';
+            resultBox.innerHTML = '<p>⏳ Checking...</p>';
 
             try {
                 const response = await fetch(CHECK_STATUS_URL, {
@@ -92,24 +159,17 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ student_id: studentId })
                 });
-
                 const data = await response.json();
                 
                 if (response.ok) {
                     currentStudentId = studentId;
                     resultBox.className = 'result success';
-                    resultBox.innerHTML = `
-                        <h3>✅ ${data.message}</h3>
-                        <p><strong>Name:</strong> ${data.student_name}</p>
-                        <p><strong>School:</strong> ${data.school_id}</p>
-                        <p><strong>Semester:</strong> ${data.semester}</p>
-                        <p><strong>Access Expires:</strong> ${data.expiry_date}</p>
-                    `;
-                    // Show the SRJ input section
-                    document.getElementById('srjInputSection').style.display = 'block';
+                    resultBox.innerHTML = `<h3>✅ ${data.message}</h3><p>Name: ${data.student_name} | School: ${data.school_id}</p>`;
+                    document.getElementById('schoolProfileSection').style.display = 'block';
+                    document.getElementById('srjSection').style.display = 'block';
                 } else {
                     resultBox.className = 'result error';
-                    resultBox.innerHTML = `<h3>❌ ${data.message}</h3><p>${data.details || ''}</p>`;
+                    resultBox.innerHTML = `<h3>❌ ${data.message}</h3>`;
                 }
             } catch (error) {
                 resultBox.className = 'result error';
@@ -117,142 +177,160 @@
             }
         }
 
-        // Function to generate daily SRJ
-        async function generateDailySRJ() {
-            if (!currentStudentId) {
-                alert('Please check your status first using "Check My Status"');
-                return;
-            }
+        async function saveSchoolProfile() {
+            if (!currentStudentId) { alert('Check status first!'); return; }
 
+            const statusDiv = document.getElementById('schoolSaveStatus');
+            statusDiv.style.display = 'block';
+            statusDiv.className = 'result loading';
+            statusDiv.innerHTML = '<p>⏳ Saving comprehensive profile...</p>';
+
+            const teaching_staff = {
+                male_professional: document.getElementById('ts_male_prof').value,
+                female_professional: document.getElementById('ts_female_prof').value,
+                male_pupil: document.getElementById('ts_male_pupil').value,
+                female_pupil: document.getElementById('ts_female_pupil').value,
+                male_ns: document.getElementById('ts_male_ns').value,
+                female_ns: document.getElementById('ts_female_ns').value
+            };
+
+            const enrollment = [];
+            document.querySelectorAll('.class-row').forEach(row => {
+                const name = row.querySelector('.cls-name').value;
+                const stream = row.querySelector('.cls-stream').value;
+                const male = parseInt(row.querySelector('.cls-male').value) || 0;
+                const female = parseInt(row.querySelector('.cls-female').value) || 0;
+                if (name) {
+                    const className = stream === 'None' ? name : `${name} ${stream}`;
+                    enrollment.push({ class_name: className, male: male, female: female });
+                }
+            });
+
+            const payload = {
+                student_id: currentStudentId,
+                school_name: document.getElementById('school_name').value,
+                school_location: document.getElementById('school_location').value,
+                school_type: document.getElementById('school_type').value,
+                school_history: document.getElementById('school_history').value,
+                mission_statement: document.getElementById('mission_statement').value,
+                vision_statement: document.getElementById('vision_statement').value,
+                core_values: document.getElementById('core_values').value,
+                teaching_staff: teaching_staff,
+                non_teaching_staff: document.getElementById('non_teaching').value,
+                student_enrollment: enrollment,
+                stakeholders: document.getElementById('stakeholders').value,
+                class_rules: document.getElementById('class_rules').value,
+                teaching_philosophy: document.getElementById('teaching_philosophy').value
+            };
+
+            try {
+                const response = await fetch(SAVE_SCHOOL_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                
+                if (response.ok) {
+                    statusDiv.className = 'result success';
+                    statusDiv.innerHTML = `<h3>✅ Saved!</h3><p>Total Students: ${result.total_students} | Teachers: ${result.total_teachers} | Ratio: 1:${result.ratio}</p>`;
+                    alert('School Profile saved successfully!');
+                } else {
+                    statusDiv.className = 'result error';
+                    statusDiv.innerHTML = `<h3>❌ Error</h3><p>${result.error}</p>`;
+                }
+            } catch (error) {
+                statusDiv.className = 'result error';
+                statusDiv.innerHTML = `<h3>🔌 Error</h3><p>${error.message}</p>`;
+            }
+        }
+
+        async function generateDailySRJ() {
+            if (!currentStudentId) { alert('Check status first!'); return; }
             const week = document.getElementById('weekNumber').value;
             const day = document.getElementById('dayNumber').value;
             const resultBox = document.getElementById('srjResult');
             
             resultBox.style.display = 'block';
             resultBox.className = 'result loading';
-            resultBox.innerHTML = '<p>🤖 Generating your daily SRJ questions...</p>';
+            resultBox.innerHTML = '<p>🤖 Generating...</p>';
 
             try {
                 const response = await fetch(GENERATE_SRJ_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        student_id: currentStudentId,
-                        week: parseInt(week),
-                        day: parseInt(day)
-                    })
+                    body: JSON.stringify({ student_id: currentStudentId, week: parseInt(week), day: parseInt(day) })
                 });
-
                 const data = await response.json();
                 
                 if (response.ok) {
                     resultBox.className = 'result success';
-                    
-                    // Build the SRJ display with INPUT FIELDS
-                    let html = `<h3>📚 Week ${week}, Day ${day} - SRJ & Observation Checklist</h3>`;
-                    html += `<p><strong>Student:</strong> Year ${data.student_year}, Semester ${data.student_semester}</p>`;
-
-                    // Display SRJ Questions with TEXT AREAS for answers
-                    html += `<div class="srj-item"><h4>📝 Student Reflective Journal - Your Answers:</h4>`;
+                    let html = `<h3>📚 Week ${week}, Day ${day}</h3>`;
+                    html += `<div class="srj-item"><h4> Questions:</h4>`;
                     if (Array.isArray(data.srj_questions)) {
-                        data.srj_questions.forEach((q, index) => {
-                            html += `<div class="srj-question">${index + 1}. ${q}</div>`;
-                            html += `<textarea id="srj-answer-${index}" rows="4" placeholder="Type your reflection here..." style="width:100%; margin-bottom:15px; padding:10px; border:1px solid #ccc; border-radius:5px;"></textarea>`;
+                        data.srj_questions.forEach((q, i) => {
+                            html += `<div class="srj-question">${i+1}. ${q}</div>`;
+                            html += `<textarea id="srj-ans-${i}" rows="3" placeholder="Your Answer..." style="width:100%; margin-bottom:10px;"></textarea>`;
                         });
-                    } else {
-                        html += `<div>${data.srj_questions}</div>`;
                     }
                     html += `</div>`;
-
-                    // Display Checklist with CHECKBOXES
-                    html += `<div class="srj-item"><h4>✅ Observation Checklist:</h4>`;
+                    
+                    html += `<div class="srj-item"><h4>✅ Checklist:</h4>`;
                     if (Array.isArray(data.checklist)) {
-                        data.checklist.forEach((item, index) => {
-                            html += `<div style="margin:10px 0;"><label><input type="checkbox" id="checklist-${index}" style="margin-right:10px;"> ${item}</label></div>`;
+                        data.checklist.forEach((item, i) => {
+                            html += `<div><input type="checkbox" id="chk-${i}"> ${item}</div>`;
                         });
-                    } else {
-                        html += `<div>${data.checklist}</div>`;
                     }
                     html += `</div>`;
-
-                    // Add SAVE button
-                    html += `<button onclick="saveDailyLog()" style="margin-top:20px; background-color:#28a745;">💾 Save My Daily Log</button>`;
-                    html += `<div id="saveStatus" style="margin-top:10px;"></div>`;
-
+                    
+                    html += `<button onclick="saveDailyLog(${week}, ${day})" style="background:#28a745">💾 Save Log</button><div id="logStatus"></div>`;
                     resultBox.innerHTML = html;
                 } else {
                     resultBox.className = 'result error';
-                    resultBox.innerHTML = `<h3>❌ Error</h3><p>${data.error || 'Failed to generate SRJ'}</p>`;
+                    resultBox.innerHTML = `<h3>❌ Error</h3><p>${data.error}</p>`;
                 }
             } catch (error) {
                 resultBox.className = 'result error';
-                resultBox.innerHTML = `<h3>🔌 Connection Error</h3><p>${error.message}</p>`;
+                resultBox.innerHTML = `<h3>🔌 Error</h3><p>${error.message}</p>`;
             }
         }
 
-        // Function to save daily log to DynamoDB
-        async function saveDailyLog() {
-            const week = document.getElementById('weekNumber').value;
-            const day = document.getElementById('dayNumber').value;
-            
-            // Collect SRJ answers
+        async function saveDailyLog(week, day) {
             const srjAnswers = [];
-            for (let i = 0; i < 3; i++) {
-                const answerElement = document.getElementById(`srj-answer-${i}`);
-                if (answerElement && answerElement.value.trim() !== '') {
-                    srjAnswers.push({
-                        question_number: i + 1,
-                        answer: answerElement.value.trim()
-                    });
-                }
+            for(let i=0; i<3; i++) {
+                const ans = document.getElementById(`srj-ans-${i}`);
+                if(ans && ans.value) srjAnswers.push({q: i+1, answer: ans.value});
             }
             
-            // Collect checklist responses
-            const checklistResponses = [];
-            for (let i = 0; i < 4; i++) {
-                const checkbox = document.getElementById(`checklist-${i}`);
-                if (checkbox) {
-                    const itemText = checkbox.parentElement.textContent.trim();
-                    checklistResponses.push({
-                        item: itemText,
-                        completed: checkbox.checked
-                    });
-                }
+            const checklist = [];
+            for(let i=0; i<4; i++) {
+                const chk = document.getElementById(`chk-${i}`);
+                if(chk) checklist.push({item: chk.nextSibling.textContent, done: chk.checked});
             }
-            
-            // Prepare data to save
-            const logData = {
-                student_id: currentStudentId,
-                week: parseInt(week),
-                day: parseInt(day),
-                srj_answers: srjAnswers,
-                checklist: checklistResponses,
-                timestamp: new Date().toISOString()
-            };
-            
-            const statusDiv = document.getElementById('saveStatus');
-            statusDiv.innerHTML = '<p>⏳ Saving...</p>';
+
+            const statusDiv = document.getElementById('logStatus');
+            statusDiv.innerHTML = 'Saving...';
             
             try {
-                // Call the save-daily-log Lambda function
-                const response = await fetch(SAVE_LOG_URL, {
+                const res = await fetch(SAVE_LOG_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(logData)
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        student_id: currentStudentId,
+                        week: week, day: day,
+                        srj_answers: srjAnswers,
+                        checklist: checklist
+                    })
                 });
-                
-                const result = await response.json();
-                
-                if (response.ok) {
-                    statusDiv.innerHTML = '<p style="color:green; font-weight:bold;">✅ Daily log saved to database!</p>';
-                    alert('Excellent work! Your daily SRJ has been saved to the database. Keep it up!');
+                const result = await res.json();
+                if(res.ok) {
+                    statusDiv.innerHTML = '<span style="color:green">✅ Saved!</span>';
+                    alert('Daily Log Saved!');
                 } else {
-                    statusDiv.innerHTML = '<p style="color:red;">❌ Error: ' + (result.error || 'Failed to save') + '</p>';
+                    statusDiv.innerHTML = '<span style="color:red">Error</span>';
                 }
-                
-            } catch (error) {
-                statusDiv.innerHTML = '<p style="color:red;">❌ Error saving. Please try again.</p>';
-                console.error('Error:', error);
+            } catch(e) {
+                statusDiv.innerHTML = '<span style="color:red">Connection Error</span>';
             }
         }
     </script>
