@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AWEN-STS REPORT GENERATOR</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f7f6; }
         .header { background-color: #232f3e; color: white; padding: 20px; text-align: center; }
@@ -57,6 +58,21 @@
             <div id="profileResult" class="result"></div>
         </div>
 
+        <!-- QR Code Generator Section -->
+        <div class="card no-print" id="qrSection" style="display:none;">
+            <h2>📱 Generate Student QR Code</h2>
+            <p>Generate and download QR code for student login:</p>
+            
+            <input type="text" id="qrStudentId" placeholder="Enter Student ID (e.g., John Doe)">
+            <button onclick="generateQRCode()">Generate QR Code</button>
+            
+            <div id="qrDisplay" style="margin-top: 20px; text-align: center; display: none;">
+                <div id="qrcode" style="display: inline-block; padding: 20px; background: white; border: 2px solid #232f3e;"></div>
+                <br>
+                <button onclick="downloadQR()" style="margin-top: 15px; background-color: #28a745;">💾 Download QR Code</button>
+            </div>
+        </div>
+
         <!-- School Profile Section -->
         <div class="card no-print" id="schoolProfileSection" style="display:none;">
             <h2>Comprehensive School Profile</h2>
@@ -101,7 +117,7 @@
             <textarea id="class_rules" rows="4" placeholder="List of School/Class Rules and Regulations"></textarea>
             <textarea id="teaching_philosophy" rows="4" placeholder="Your Personal Teaching Philosophy as a Trainee"></textarea>
 
-            <button type="button" onclick="saveSchoolProfile()" class="large">💾 Save School Profile</button>
+            <button type="button" onclick="saveSchoolProfile()" class="large"> Save School Profile</button>
             <div id="schoolSaveStatus" class="result"></div>
         </div>
 
@@ -118,8 +134,8 @@
 
         <!-- Generate Final Report Section -->
         <div class="card no-print" id="reportSection" style="display:none;">
-            <h2>🎓 Generate Final Internship Report</h2>
-            <p>Click the button below to generate your comprehensive 5-Chapter internship report using AI.</p>
+            <h2> Generate Final Internship Report</h2>
+            <p>Click the button below to generate your comprehensive 5-Chapter internship report.</p>
             <p style="background: #fff3cd; padding: 15px; border-left: 5px solid #ff9900; border-radius: 5px;">
                 <strong>Note:</strong> This will analyze all your saved data (School Profile + Daily Logs) and generate a professional academic report.
             </p>
@@ -147,6 +163,7 @@
         const GENERATE_REPORT_URL = 'https://c746jcx5oxzbwwdct2xmsfy5540cfafy.lambda-url.us-east-1.on.aws/';
 
         let currentStudentId = null;
+        let currentQRCode = null;
 
         const defaultClasses = [
             "Creche", "KG 1", "KG 2", 
@@ -201,13 +218,50 @@
                     document.getElementById('schoolProfileSection').style.display = 'block';
                     document.getElementById('srjSection').style.display = 'block';
                     document.getElementById('reportSection').style.display = 'block';
+                    document.getElementById('qrSection').style.display = 'block';
                 } else {
                     resultBox.className = 'result error';
-                    resultBox.innerHTML = `<h3>❌ ${data.message}</h3>`;
+                    resultBox.innerHTML = `<h3> ${data.message}</h3>`;
                 }
             } catch (error) {
                 resultBox.className = 'result error';
                 resultBox.innerHTML = `<h3>🔌 Error</h3><p>${error.message}</p>`;
+            }
+        }
+
+        function generateQRCode() {
+            const studentId = document.getElementById('qrStudentId').value;
+            const qrDisplay = document.getElementById('qrDisplay');
+            const qrcodeContainer = document.getElementById('qrcode');
+            
+            if (!studentId) {
+                alert('Please enter a Student ID');
+                return;
+            }
+            
+            // Clear previous QR code
+            qrcodeContainer.innerHTML = '';
+            
+            // Generate new QR code
+            currentQRCode = new QRCode(qrcodeContainer, {
+                text: studentId,
+                width: 256,
+                height: 256,
+                colorDark: '#232f3e',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            
+            qrDisplay.style.display = 'block';
+        }
+
+        function downloadQR() {
+            const canvas = document.querySelector('#qrcode canvas');
+            if (canvas) {
+                const link = document.createElement('a');
+                link.download = `QR_Code_${document.getElementById('qrStudentId').value.replace(/\s+/g, '_')}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
             }
         }
 
@@ -377,7 +431,7 @@
             
             statusDiv.style.display = 'block';
             statusDiv.className = 'result loading';
-            statusDiv.innerHTML = '<h3>🤖 AI is generating your comprehensive report...</h3><p>This may take 2-3 minutes. Please wait...</p>';
+            statusDiv.innerHTML = '<h3>🤖 Generating your comprehensive report...</h3><p>This may take 2-3 minutes. Please wait...</p>';
             
             try {
                 const response = await fetch(GENERATE_REPORT_URL, {
@@ -428,6 +482,8 @@
         p { text-align: justify; margin: 15px 0; }
         ul, ol { margin: 15px 0; padding-left: 30px; }
         li { margin: 8px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        td, th { border: 1px solid #ddd; padding: 10px; }
     </style>
 </head>
 <body>
