@@ -28,7 +28,6 @@
         .class-row input, .class-row select { margin: 0; flex: 1; }
         .class-row .remove-btn { background: #f44336; padding: 10px; min-width: 40px; margin: 0; }
         
-        /* Report Styles */
         #reportDisplay { margin-top: 20px; padding: 30px; background: white; border: 2px solid #232f3e; border-radius: 8px; display: none; }
         #reportDisplay h1 { color: #232f3e; text-align: center; border-bottom: 3px solid #ff9900; padding-bottom: 15px; }
         #reportDisplay h2 { color: #ff9900; border-bottom: 2px solid #232f3e; margin-top: 30px; }
@@ -58,9 +57,9 @@
             <div id="profileResult" class="result"></div>
         </div>
 
-        <!-- QR Code Generator Section -->
+        <!-- QR Code Generator Section (Admin Only) -->
         <div class="card no-print" id="qrSection" style="display:none;">
-            <h2>📱 Generate Student QR Code</h2>
+            <h2>📱 Generate Student QR Code (Admin Only)</h2>
             <p>Generate and download QR code for student login:</p>
             
             <input type="text" id="qrStudentId" placeholder="Enter Student ID (e.g., John Doe)">
@@ -117,7 +116,7 @@
             <textarea id="class_rules" rows="4" placeholder="List of School/Class Rules and Regulations"></textarea>
             <textarea id="teaching_philosophy" rows="4" placeholder="Your Personal Teaching Philosophy as a Trainee"></textarea>
 
-            <button type="button" onclick="saveSchoolProfile()" class="large"> Save School Profile</button>
+            <button type="button" onclick="saveSchoolProfile()" class="large">💾 Save School Profile</button>
             <div id="schoolSaveStatus" class="result"></div>
         </div>
 
@@ -134,11 +133,8 @@
 
         <!-- Generate Final Report Section -->
         <div class="card no-print" id="reportSection" style="display:none;">
-            <h2> Generate Final Internship Report</h2>
+            <h2>🎓 Generate Final Internship Report</h2>
             <p>Click the button below to generate your comprehensive 5-Chapter internship report.</p>
-            <p style="background: #fff3cd; padding: 15px; border-left: 5px solid #ff9900; border-radius: 5px;">
-                <strong>Note:</strong> This will analyze all your saved data (School Profile + Daily Logs) and generate a professional academic report.
-            </p>
             <button onclick="generateFinalReport()" class="large" style="background-color: #28a745; font-size: 20px;">📄 Generate Complete Report</button>
             <div id="reportStatus" class="result"></div>
         </div>
@@ -161,6 +157,9 @@
         const SAVE_LOG_URL = 'https://3n6sennmgib2fc24fz3ynbm5u40zekrs.lambda-url.us-east-1.on.aws/';
         const SAVE_SCHOOL_URL = 'https://4clxwpc6j7hnty44gxusrqvwnu0mqiwl.lambda-url.us-east-1.on.aws/';
         const GENERATE_REPORT_URL = 'https://c746jcx5oxzbwwdct2xmsfy5540cfafy.lambda-url.us-east-1.on.aws/';
+
+        // ⚠️ CHANGE THIS TO YOUR ACTUAL ADMIN NAME ⚠️
+        const ADMIN_ID = 'Kwame Mensah'; 
 
         let currentStudentId = null;
         let currentQRCode = null;
@@ -215,13 +214,21 @@
                     currentStudentId = studentId;
                     resultBox.className = 'result success';
                     resultBox.innerHTML = `<h3>✅ ${data.message}</h3><p>Name: ${data.student_name} | School: ${data.school_id}</p>`;
+                    
+                    // Show standard sections for everyone
                     document.getElementById('schoolProfileSection').style.display = 'block';
                     document.getElementById('srjSection').style.display = 'block';
                     document.getElementById('reportSection').style.display = 'block';
-                    document.getElementById('qrSection').style.display = 'block';
+                    
+                    // ONLY show QR section if the logged-in user is the Admin
+                    if (currentStudentId === ADMIN_ID) {
+                        document.getElementById('qrSection').style.display = 'block';
+                    } else {
+                        document.getElementById('qrSection').style.display = 'none';
+                    }
                 } else {
                     resultBox.className = 'result error';
-                    resultBox.innerHTML = `<h3> ${data.message}</h3>`;
+                    resultBox.innerHTML = `<h3>❌ ${data.message}</h3>`;
                 }
             } catch (error) {
                 resultBox.className = 'result error';
@@ -239,10 +246,8 @@
                 return;
             }
             
-            // Clear previous QR code
             qrcodeContainer.innerHTML = '';
             
-            // Generate new QR code
             currentQRCode = new QRCode(qrcodeContainer, {
                 text: studentId,
                 width: 256,
@@ -329,7 +334,7 @@
                 }
             } catch (error) {
                 statusDiv.className = 'result error';
-                statusDiv.innerHTML = `<h3>🔌 Error</h3><p>${error.message}</p>`;
+                statusDiv.innerHTML = `<h3> Error</h3><p>${error.message}</p>`;
             }
         }
 
@@ -341,7 +346,7 @@
             
             resultBox.style.display = 'block';
             resultBox.className = 'result loading';
-            resultBox.innerHTML = '<p>🤖 Generating...</p>';
+            resultBox.innerHTML = '<p> Generating...</p>';
 
             try {
                 const response = await fetch(GENERATE_SRJ_URL, {
@@ -354,7 +359,7 @@
                 if (response.ok) {
                     resultBox.className = 'result success';
                     let html = `<h3>📚 Week ${week}, Day ${day}</h3>`;
-                    html += `<div class="srj-item"><h4> Questions:</h4>`;
+                    html += `<div class="srj-item"><h4>📝 Questions:</h4>`;
                     if (Array.isArray(data.srj_questions)) {
                         data.srj_questions.forEach((q, i) => {
                             html += `<div class="srj-question">${i+1}. ${q}</div>`;
@@ -371,7 +376,7 @@
                     }
                     html += `</div>`;
                     
-                    html += `<button onclick="saveDailyLog(${week}, ${day})" style="background:#28a745"> Save Log</button><div id="logStatus"></div>`;
+                    html += `<button onclick="saveDailyLog(${week}, ${day})" style="background:#28a745">💾 Save Log</button><div id="logStatus"></div>`;
                     resultBox.innerHTML = html;
                 } else {
                     resultBox.className = 'result error';
@@ -431,7 +436,7 @@
             
             statusDiv.style.display = 'block';
             statusDiv.className = 'result loading';
-            statusDiv.innerHTML = '<h3>🤖 Generating your comprehensive report...</h3><p>This may take 2-3 minutes. Please wait...</p>';
+            statusDiv.innerHTML = '<h3>🤖 Generating your comprehensive report...</h3><p>Please wait...</p>';
             
             try {
                 const response = await fetch(GENERATE_REPORT_URL, {
@@ -446,11 +451,8 @@
                     statusDiv.className = 'result success';
                     statusDiv.innerHTML = '<h3>✅ Report Generated Successfully!</h3>';
                     
-                    // Display the report
                     reportContent.innerHTML = data.report_html;
                     reportDisplay.style.display = 'block';
-                    
-                    // Scroll to report
                     reportDisplay.scrollIntoView({ behavior: 'smooth' });
                     
                     alert('Your report is ready! You can now print or download it.');
@@ -460,7 +462,7 @@
                 }
             } catch (error) {
                 statusDiv.className = 'result error';
-                statusDiv.innerHTML = `<h3> Connection Error</h3><p>${error.message}</p>`;
+                statusDiv.innerHTML = `<h3>🔌 Connection Error</h3><p>${error.message}</p>`;
             }
         }
 
