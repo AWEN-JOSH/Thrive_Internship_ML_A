@@ -61,10 +61,8 @@
         <div class="card no-print" id="qrSection" style="display:none;">
             <h2>📱 Generate Student QR Code (Admin Only)</h2>
             <p>Generate and download QR code for student login:</p>
-            
             <input type="text" id="qrStudentId" placeholder="Enter Student ID (e.g., John Doe)">
             <button onclick="generateQRCode()">Generate QR Code</button>
-            
             <div id="qrDisplay" style="margin-top: 20px; text-align: center; display: none;">
                 <div id="qrcode" style="display: inline-block; padding: 20px; background: white; border: 2px solid #232f3e;"></div>
                 <br>
@@ -75,8 +73,6 @@
         <!-- School Profile Section -->
         <div class="card no-print" id="schoolProfileSection" style="display:none;">
             <h2>Comprehensive School Profile</h2>
-            <p>Fill in the details of your practice school for Chapter 2 of your report.</p>
-            
             <h3>1. Basic Information</h3>
             <input type="text" id="school_name" placeholder="School Name" required>
             <input type="text" id="school_location" placeholder="Location (Town, District, Region)" required>
@@ -89,6 +85,9 @@
             <textarea id="mission_statement" rows="2" placeholder="Mission Statement"></textarea>
             <textarea id="vision_statement" rows="2" placeholder="Vision Statement"></textarea>
             <textarea id="core_values" rows="2" placeholder="Core Values (comma separated)"></textarea>
+            
+            <!-- NEW: School Facilities -->
+            <textarea id="school_facilities" rows="3" placeholder="List of School Facilities (e.g., Library, Computer Lab, Science Lab, Sports Field, Assembly Hall, etc.)"></textarea>
 
             <h3>2. Teaching Staff Breakdown</h3>
             <div class="form-row">
@@ -122,12 +121,30 @@
 
         <!-- Daily SRJ Log Section -->
         <div class="card no-print" id="srjSection" style="display:none;">
-            <h2>Daily SRJ Log</h2>
+            <h2>Daily SRJ Log & Class Observation</h2>
             <div class="form-row">
                 <div class="form-col"><label>Week (1-6)</label><input type="number" id="weekNumber" min="1" max="6" value="1"></div>
                 <div class="form-col"><label>Day (1-5)</label><input type="number" id="dayNumber" min="1" max="5" value="1"></div>
             </div>
-            <button onclick="generateDailySRJ()">Generate Daily SRJ</button>
+            
+            <!-- NEW: Daily Class Observation -->
+            <h3>📚 Today's Class Observation</h3>
+            <div class="form-row">
+                <div class="form-col">
+                    <label>Class Observed</label>
+                    <input type="text" id="obsClass" placeholder="e.g., Primary 4A">
+                </div>
+                <div class="form-col">
+                    <label>Subject Taught</label>
+                    <input type="text" id="obsSubject" placeholder="e.g., Mathematics">
+                </div>
+                <div class="form-col">
+                    <label>Teacher's Name</label>
+                    <input type="text" id="obsTeacher" placeholder="e.g., Mr. Johnson">
+                </div>
+            </div>
+
+            <button onclick="generateDailySRJ()">Generate Daily SRJ Questions</button>
             <div id="srjResult" class="result"></div>
         </div>
 
@@ -135,7 +152,7 @@
         <div class="card no-print" id="reportSection" style="display:none;">
             <h2>🎓 Generate Final Internship Report</h2>
             <p>Click the button below to generate your comprehensive 5-Chapter internship report.</p>
-            <button onclick="generateFinalReport()" class="large" style="background-color: #28a745; font-size: 20px;">📄 Generate Complete Report</button>
+            <button onclick="generateFinalReport()" class="large" style="background-color: #28a745; font-size: 20px;"> Generate Complete Report</button>
             <div id="reportStatus" class="result"></div>
         </div>
 
@@ -143,7 +160,7 @@
         <div id="reportDisplay">
             <div class="no-print" style="text-align: right; margin-bottom: 20px;">
                 <button onclick="window.print()" style="background: #232f3e;">🖨️ Print Report</button>
-                <button onclick="downloadReport()" style="background: #28a745;">💾 Download as HTML</button>
+                <button onclick="downloadReport()" style="background: #28a745;"> Download as HTML</button>
                 <button onclick="document.getElementById('reportDisplay').style.display='none'" style="background: #f44336;">Close</button>
             </div>
             <div id="reportContent"></div>
@@ -158,17 +175,11 @@
         const SAVE_SCHOOL_URL = 'https://4clxwpc6j7hnty44gxusrqvwnu0mqiwl.lambda-url.us-east-1.on.aws/';
         const GENERATE_REPORT_URL = 'https://c746jcx5oxzbwwdct2xmsfy5540cfafy.lambda-url.us-east-1.on.aws/';
 
-        // ⚠️ CHANGE THIS TO YOUR ACTUAL ADMIN NAME ⚠️
-        const ADMIN_ID = 'Kwame Mensah'; 
-
+        const ADMIN_ID = 'Kwame Mensah'; // Change this to your actual admin name
         let currentStudentId = null;
         let currentQRCode = null;
 
-        const defaultClasses = [
-            "Creche", "KG 1", "KG 2", 
-            "Primary 1", "Primary 2", "Primary 3", "Primary 4", "Primary 5", "Primary 6", 
-            "JHS 1", "JHS 2", "JHS 3"
-        ];
+        const defaultClasses = ["Creche", "KG 1", "KG 2", "Primary 1", "Primary 2", "Primary 3", "Primary 4", "Primary 5", "Primary 6", "JHS 1", "JHS 2", "JHS 3"];
 
         function addClassRow(className = "", stream = "None", male = 0, female = 0) {
             const container = document.getElementById('enrollmentContainer');
@@ -189,9 +200,7 @@
             container.appendChild(div);
         }
 
-        window.onload = function() {
-            defaultClasses.forEach(cls => addClassRow(cls));
-        };
+        window.onload = function() { defaultClasses.forEach(cls => addClassRow(cls)); };
 
         async function checkStudentStatus() {
             const studentId = document.getElementById('studentIdInput').value;
@@ -214,13 +223,10 @@
                     currentStudentId = studentId;
                     resultBox.className = 'result success';
                     resultBox.innerHTML = `<h3>✅ ${data.message}</h3><p>Name: ${data.student_name} | School: ${data.school_id}</p>`;
-                    
-                    // Show standard sections for everyone
                     document.getElementById('schoolProfileSection').style.display = 'block';
                     document.getElementById('srjSection').style.display = 'block';
                     document.getElementById('reportSection').style.display = 'block';
                     
-                    // ONLY show QR section if the logged-in user is the Admin
                     if (currentStudentId === ADMIN_ID) {
                         document.getElementById('qrSection').style.display = 'block';
                     } else {
@@ -240,23 +246,9 @@
             const studentId = document.getElementById('qrStudentId').value;
             const qrDisplay = document.getElementById('qrDisplay');
             const qrcodeContainer = document.getElementById('qrcode');
-            
-            if (!studentId) {
-                alert('Please enter a Student ID');
-                return;
-            }
-            
+            if (!studentId) { alert('Please enter a Student ID'); return; }
             qrcodeContainer.innerHTML = '';
-            
-            currentQRCode = new QRCode(qrcodeContainer, {
-                text: studentId,
-                width: 256,
-                height: 256,
-                colorDark: '#232f3e',
-                colorLight: '#ffffff',
-                correctLevel: QRCode.CorrectLevel.H
-            });
-            
+            currentQRCode = new QRCode(qrcodeContainer, { text: studentId, width: 256, height: 256, colorDark: '#232f3e', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H });
             qrDisplay.style.display = 'block';
         }
 
@@ -272,7 +264,6 @@
 
         async function saveSchoolProfile() {
             if (!currentStudentId) { alert('Check status first!'); return; }
-
             const statusDiv = document.getElementById('schoolSaveStatus');
             statusDiv.style.display = 'block';
             statusDiv.className = 'result loading';
@@ -308,6 +299,7 @@
                 mission_statement: document.getElementById('mission_statement').value,
                 vision_statement: document.getElementById('vision_statement').value,
                 core_values: document.getElementById('core_values').value,
+                school_facilities: document.getElementById('school_facilities').value, // NEW FIELD
                 teaching_staff: teaching_staff,
                 non_teaching_staff: document.getElementById('non_teaching').value,
                 student_enrollment: enrollment,
@@ -323,7 +315,6 @@
                     body: JSON.stringify(payload)
                 });
                 const result = await response.json();
-                
                 if (response.ok) {
                     statusDiv.className = 'result success';
                     statusDiv.innerHTML = `<h3>✅ Saved!</h3><p>Total Students: ${result.total_students} | Teachers: ${result.total_teachers} | Ratio: 1:${result.ratio}</p>`;
@@ -334,7 +325,7 @@
                 }
             } catch (error) {
                 statusDiv.className = 'result error';
-                statusDiv.innerHTML = `<h3> Error</h3><p>${error.message}</p>`;
+                statusDiv.innerHTML = `<h3>🔌 Error</h3><p>${error.message}</p>`;
             }
         }
 
@@ -346,7 +337,7 @@
             
             resultBox.style.display = 'block';
             resultBox.className = 'result loading';
-            resultBox.innerHTML = '<p> Generating...</p>';
+            resultBox.innerHTML = '<p>🤖 Generating unique questions for Week '+week+', Day '+day+'...</p>';
 
             try {
                 const response = await fetch(GENERATE_SRJ_URL, {
@@ -358,17 +349,17 @@
                 
                 if (response.ok) {
                     resultBox.className = 'result success';
-                    let html = `<h3>📚 Week ${week}, Day ${day}</h3>`;
-                    html += `<div class="srj-item"><h4>📝 Questions:</h4>`;
+                    let html = `<h3>📚 Week ${week}, Day ${day} - Unique Questions</h3>`;
+                    html += `<div class="srj-item"><h4>📝 Reflective Questions:</h4>`;
                     if (Array.isArray(data.srj_questions)) {
                         data.srj_questions.forEach((q, i) => {
-                            html += `<div class="srj-question">${i+1}. ${q}</div>`;
+                            html += `<div class="srj-question" style="margin-top:10px; font-weight:bold;">${i+1}. ${q}</div>`;
                             html += `<textarea id="srj-ans-${i}" rows="3" placeholder="Your Answer..." style="width:100%; margin-bottom:10px;"></textarea>`;
                         });
                     }
                     html += `</div>`;
                     
-                    html += `<div class="srj-item"><h4>✅ Checklist:</h4>`;
+                    html += `<div class="srj-item"><h4>✅ Observation Checklist:</h4>`;
                     if (Array.isArray(data.checklist)) {
                         data.checklist.forEach((item, i) => {
                             html += `<div><input type="checkbox" id="chk-${i}"> ${item}</div>`;
@@ -376,7 +367,7 @@
                     }
                     html += `</div>`;
                     
-                    html += `<button onclick="saveDailyLog(${week}, ${day})" style="background:#28a745">💾 Save Log</button><div id="logStatus"></div>`;
+                    html += `<button onclick="saveDailyLog(${week}, ${day})" style="background:#28a745; width:100%; font-size:18px;">💾 Save Daily Log & Observation</button><div id="logStatus"></div>`;
                     resultBox.innerHTML = html;
                 } else {
                     resultBox.className = 'result error';
@@ -401,6 +392,13 @@
                 if(chk) checklist.push({item: chk.nextSibling.textContent, done: chk.checked});
             }
 
+            // NEW: Capture Observation Data
+            const observation = {
+                class_observed: document.getElementById('obsClass').value,
+                subject_taught: document.getElementById('obsSubject').value,
+                teacher_name: document.getElementById('obsTeacher').value
+            };
+
             const statusDiv = document.getElementById('logStatus');
             statusDiv.innerHTML = 'Saving...';
             
@@ -411,14 +409,15 @@
                     body: JSON.stringify({
                         student_id: currentStudentId,
                         week: week, day: day,
+                        observation: observation, // NEW
                         srj_answers: srjAnswers,
                         checklist: checklist
                     })
                 });
                 const result = await res.json();
                 if(res.ok) {
-                    statusDiv.innerHTML = '<span style="color:green">✅ Saved!</span>';
-                    alert('Daily Log Saved!');
+                    statusDiv.innerHTML = '<span style="color:green; font-weight:bold; font-size:16px;">✅ Daily Log & Observation Saved Successfully!</span>';
+                    alert('Saved!');
                 } else {
                     statusDiv.innerHTML = '<span style="color:red">Error</span>';
                 }
@@ -429,7 +428,6 @@
 
         async function generateFinalReport() {
             if (!currentStudentId) { alert('Check status first!'); return; }
-            
             const statusDiv = document.getElementById('reportStatus');
             const reportDisplay = document.getElementById('reportDisplay');
             const reportContent = document.getElementById('reportContent');
@@ -444,18 +442,15 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ student_id: currentStudentId })
                 });
-                
                 const data = await response.json();
                 
                 if (response.ok) {
                     statusDiv.className = 'result success';
                     statusDiv.innerHTML = '<h3>✅ Report Generated Successfully!</h3>';
-                    
                     reportContent.innerHTML = data.report_html;
                     reportDisplay.style.display = 'block';
                     reportDisplay.scrollIntoView({ behavior: 'smooth' });
-                    
-                    alert('Your report is ready! You can now print or download it.');
+                    alert('Your report is ready!');
                 } else {
                     statusDiv.className = 'result error';
                     statusDiv.innerHTML = `<h3>❌ Error</h3><p>${data.error}</p>`;
@@ -470,29 +465,7 @@
             const reportContent = document.getElementById('reportContent').innerHTML;
             const studentName = currentStudentId.replace(/\s+/g, '_');
             const timestamp = new Date().toISOString().split('T')[0];
-            
-            const htmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Internship Report - ${currentStudentId}</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
-        h1 { color: #232f3e; text-align: center; border-bottom: 3px solid #ff9900; padding-bottom: 15px; }
-        h2 { color: #ff9900; border-bottom: 2px solid #232f3e; margin-top: 30px; }
-        h3 { color: #232f3e; border-bottom: 1px solid #ccc; }
-        p { text-align: justify; margin: 15px 0; }
-        ul, ol { margin: 15px 0; padding-left: 30px; }
-        li { margin: 8px 0; }
-        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-        td, th { border: 1px solid #ddd; padding: 10px; }
-    </style>
-</head>
-<body>
-    ${reportContent}
-</body>
-</html>`;
-            
+            const htmlContent = `<!DOCTYPE html><html><head><title>Internship Report - ${currentStudentId}</title><style>body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; } h1 { color: #232f3e; text-align: center; border-bottom: 3px solid #ff9900; padding-bottom: 15px; } h2 { color: #ff9900; border-bottom: 2px solid #232f3e; margin-top: 30px; } h3 { color: #232f3e; border-bottom: 1px solid #ccc; } p { text-align: justify; margin: 15px 0; } ul, ol { margin: 15px 0; padding-left: 30px; } li { margin: 8px 0; } table { width: 100%; border-collapse: collapse; margin: 15px 0; } td, th { border: 1px solid #ddd; padding: 10px; }</style></head><body>${reportContent}</body></html>`;
             const blob = new Blob([htmlContent], { type: 'text/html' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
