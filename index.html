@@ -52,7 +52,24 @@
         <!-- My Profile Section -->
         <div class="card no-print">
             <h2>My Profile (QR Status)</h2>
-            <input type="text" id="studentIdInput" placeholder="Enter Student ID (e.g., Kwame Mensah)">
+            <div class="form-row">
+                <div class="form-col">
+                    <input type="text" id="studentIdInput" placeholder="Enter Student ID (e.g., Kwame Mensah)">
+                </div>
+                <div class="form-col">
+                    <!-- UPDATED 8-SEMESTER DROPDOWN -->
+                    <select id="semesterSelect">
+                        <option value="1">Sem 1: Child Study & Observation</option>
+                        <option value="2">Sem 2: Micro-Teaching & Embedded Practice</option>
+                        <option value="3">Sem 3: Teaching Practice I (Core Subjects)</option>
+                        <option value="4">Sem 4: Teaching Practice II (Electives)</option>
+                        <option value="5">Sem 5: Inclusive Education & Special Needs</option>
+                        <option value="6">Sem 6: Action Research & School Admin</option>
+                        <option value="7">Sem 7: Professional Internship & Portfolio</option>
+                        <option value="8">Sem 8: Capstone & Career Transition</option>
+                    </select>
+                </div>
+            </div>
             <button onclick="checkStudentStatus()">Check My Status</button>
             <div id="profileResult" class="result"></div>
         </div>
@@ -86,7 +103,7 @@
             <textarea id="vision_statement" rows="2" placeholder="Vision Statement"></textarea>
             <textarea id="core_values" rows="2" placeholder="Core Values (comma separated)"></textarea>
             
-            <!-- NEW: School Facilities -->
+            <!-- School Facilities Field -->
             <textarea id="school_facilities" rows="3" placeholder="List of School Facilities (e.g., Library, Computer Lab, Science Lab, Sports Field, Assembly Hall, etc.)"></textarea>
 
             <h3>2. Teaching Staff Breakdown</h3>
@@ -127,7 +144,7 @@
                 <div class="form-col"><label>Day (1-5)</label><input type="number" id="dayNumber" min="1" max="5" value="1"></div>
             </div>
             
-            <!-- NEW: Daily Class Observation -->
+            <!-- Daily Class Observation -->
             <h3>📚 Today's Class Observation</h3>
             <div class="form-row">
                 <div class="form-col">
@@ -152,7 +169,7 @@
         <div class="card no-print" id="reportSection" style="display:none;">
             <h2>🎓 Generate Final Internship Report</h2>
             <p>Click the button below to generate your comprehensive 5-Chapter internship report.</p>
-            <button onclick="generateFinalReport()" class="large" style="background-color: #28a745; font-size: 20px;"> Generate Complete Report</button>
+            <button onclick="generateFinalReport()" class="large" style="background-color: #28a745; font-size: 20px;">📄 Generate Complete Report</button>
             <div id="reportStatus" class="result"></div>
         </div>
 
@@ -160,7 +177,7 @@
         <div id="reportDisplay">
             <div class="no-print" style="text-align: right; margin-bottom: 20px;">
                 <button onclick="window.print()" style="background: #232f3e;">🖨️ Print Report</button>
-                <button onclick="downloadReport()" style="background: #28a745;"> Download as HTML</button>
+                <button onclick="downloadReport()" style="background: #28a745;">💾 Download as HTML</button>
                 <button onclick="document.getElementById('reportDisplay').style.display='none'" style="background: #f44336;">Close</button>
             </div>
             <div id="reportContent"></div>
@@ -204,25 +221,29 @@
 
         async function checkStudentStatus() {
             const studentId = document.getElementById('studentIdInput').value;
+            const semester = document.getElementById('semesterSelect').value;
             const resultBox = document.getElementById('profileResult');
             if (!studentId) { alert('Please enter Student ID'); return; }
 
             resultBox.style.display = 'block';
             resultBox.className = 'result loading';
-            resultBox.innerHTML = '<p>⏳ Checking...</p>';
+            resultBox.innerHTML = '<p> Checking...</p>';
 
             try {
                 const response = await fetch(CHECK_STATUS_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ student_id: studentId })
+                    body: JSON.stringify({ 
+                        student_id: studentId,
+                        semester: semester 
+                    })
                 });
                 const data = await response.json();
                 
                 if (response.ok) {
                     currentStudentId = studentId;
                     resultBox.className = 'result success';
-                    resultBox.innerHTML = `<h3>✅ ${data.message}</h3><p>Name: ${data.student_name} | School: ${data.school_id}</p>`;
+                    resultBox.innerHTML = `<h3>✅ ${data.message}</h3><p>Name: ${data.student_name} | School: ${data.school_id} | Semester: ${semester}</p>`;
                     document.getElementById('schoolProfileSection').style.display = 'block';
                     document.getElementById('srjSection').style.display = 'block';
                     document.getElementById('reportSection').style.display = 'block';
@@ -299,7 +320,7 @@
                 mission_statement: document.getElementById('mission_statement').value,
                 vision_statement: document.getElementById('vision_statement').value,
                 core_values: document.getElementById('core_values').value,
-                school_facilities: document.getElementById('school_facilities').value, // NEW FIELD
+                school_facilities: document.getElementById('school_facilities').value,
                 teaching_staff: teaching_staff,
                 non_teaching_staff: document.getElementById('non_teaching').value,
                 student_enrollment: enrollment,
@@ -333,23 +354,29 @@
             if (!currentStudentId) { alert('Check status first!'); return; }
             const week = document.getElementById('weekNumber').value;
             const day = document.getElementById('dayNumber').value;
+            const semester = document.getElementById('semesterSelect').value;
             const resultBox = document.getElementById('srjResult');
             
             resultBox.style.display = 'block';
             resultBox.className = 'result loading';
-            resultBox.innerHTML = '<p>🤖 Generating unique questions for Week '+week+', Day '+day+'...</p>';
+            resultBox.innerHTML = `<p>🤖 Generating unique questions for Sem ${semester}, Week ${week}, Day ${day}...</p>`;
 
             try {
                 const response = await fetch(GENERATE_SRJ_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ student_id: currentStudentId, week: parseInt(week), day: parseInt(day) })
+                    body: JSON.stringify({ 
+                        student_id: currentStudentId, 
+                        week: parseInt(week), 
+                        day: parseInt(day),
+                        semester: parseInt(semester)
+                    })
                 });
                 const data = await response.json();
                 
                 if (response.ok) {
                     resultBox.className = 'result success';
-                    let html = `<h3>📚 Week ${week}, Day ${day} - Unique Questions</h3>`;
+                    let html = `<h3>📚 Semester ${semester} | Week ${week}, Day ${day}</h3>`;
                     html += `<div class="srj-item"><h4>📝 Reflective Questions:</h4>`;
                     if (Array.isArray(data.srj_questions)) {
                         data.srj_questions.forEach((q, i) => {
@@ -375,7 +402,7 @@
                 }
             } catch (error) {
                 resultBox.className = 'result error';
-                resultBox.innerHTML = `<h3>🔌 Error</h3><p>${error.message}</p>`;
+                resultBox.innerHTML = `<h3> Error</h3><p>${error.message}</p>`;
             }
         }
 
@@ -392,7 +419,6 @@
                 if(chk) checklist.push({item: chk.nextSibling.textContent, done: chk.checked});
             }
 
-            // NEW: Capture Observation Data
             const observation = {
                 class_observed: document.getElementById('obsClass').value,
                 subject_taught: document.getElementById('obsSubject').value,
@@ -409,7 +435,7 @@
                     body: JSON.stringify({
                         student_id: currentStudentId,
                         week: week, day: day,
-                        observation: observation, // NEW
+                        observation: observation,
                         srj_answers: srjAnswers,
                         checklist: checklist
                     })
@@ -434,7 +460,7 @@
             
             statusDiv.style.display = 'block';
             statusDiv.className = 'result loading';
-            statusDiv.innerHTML = '<h3>🤖 Generating your comprehensive report...</h3><p>Please wait...</p>';
+            statusDiv.innerHTML = '<h3> Generating your comprehensive report...</h3><p>Please wait...</p>';
             
             try {
                 const response = await fetch(GENERATE_REPORT_URL, {
