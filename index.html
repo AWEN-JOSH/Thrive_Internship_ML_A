@@ -57,7 +57,6 @@
                     <input type="text" id="studentIdInput" placeholder="Enter Student ID (e.g., Kwame Mensah)">
                 </div>
                 <div class="form-col">
-                    <!-- UPDATED 8-SEMESTER DROPDOWN -->
                     <select id="semesterSelect">
                         <option value="1">Sem 1: Child Study & Observation</option>
                         <option value="2">Sem 2: Micro-Teaching & Embedded Practice</option>
@@ -74,17 +73,76 @@
             <div id="profileResult" class="result"></div>
         </div>
 
-        <!-- QR Code Generator Section (Admin Only) -->
-        <div class="card no-print" id="qrSection" style="display:none;">
-            <h2>📱 Generate Student QR Code (Admin Only)</h2>
-            <p>Generate and download QR code for student login:</p>
-            <input type="text" id="qrStudentId" placeholder="Enter Student ID (e.g., John Doe)">
-            <button onclick="generateQRCode()">Generate QR Code</button>
+        <!-- Admin Section (QR Code & Enrollment - Kwame Only) -->
+        <div class="card no-print" id="adminSection" style="display:none; border: 2px solid #ff9900;">
+            <h2>👑 Administrator Dashboard (Kwame Mensah Only)</h2>
+            
+            <!-- Part 1: QR Code Generator -->
+            <h3>📱 Generate Student QR Code</h3>
+            <div class="form-row">
+                <div class="form-col">
+                    <input type="text" id="qrStudentId" placeholder="Enter Student ID to generate QR">
+                </div>
+                <div class="form-col">
+                    <button onclick="generateQRCode()">Generate QR Code</button>
+                </div>
+            </div>
             <div id="qrDisplay" style="margin-top: 20px; text-align: center; display: none;">
                 <div id="qrcode" style="display: inline-block; padding: 20px; background: white; border: 2px solid #232f3e;"></div>
                 <br>
                 <button onclick="downloadQR()" style="margin-top: 15px; background-color: #28a745;">💾 Download QR Code</button>
             </div>
+
+            <hr style="margin: 30px 0; border: 0; border-top: 1px solid #ccc;">
+
+            <!-- Part 2: Student Enrollment Form -->
+            <h3> Enroll New Student</h3>
+            <div class="form-row">
+                <div class="form-col">
+                    <label>Student ID (Login Name) *</label>
+                    <input type="text" id="enrollId" placeholder="e.g. Ama Baba">
+                </div>
+                <div class="form-col">
+                    <label>Full Name *</label>
+                    <input type="text" id="enrollName" placeholder="e.g. Ama Baba">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-col">
+                    <label>Practice School</label>
+                    <input type="text" id="enrollSchool" placeholder="e.g. St. Mary's JHS">
+                </div>
+                <div class="form-col">
+                    <label>Current Semester</label>
+                    <select id="enrollSemester">
+                        <option value="1">Sem 1: Child Study</option>
+                        <option value="2">Sem 2: Micro-Teaching</option>
+                        <option value="3">Sem 3: Core Subjects</option>
+                        <option value="4">Sem 4: Electives</option>
+                        <option value="5">Sem 5: Inclusive Ed</option>
+                        <option value="6">Sem 6: Action Research</option>
+                        <option value="7">Sem 7: Internship</option>
+                        <option value="8">Sem 8: Capstone</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-col">
+                    <label>Year Level</label>
+                    <select id="enrollYear">
+                        <option value="Year 1">Year 1</option>
+                        <option value="Year 2">Year 2</option>
+                        <option value="Year 3">Year 3</option>
+                        <option value="Year 4">Year 4</option>
+                    </select>
+                </div>
+                <div class="form-col">
+                    <label>Expiry Date</label>
+                    <input type="date" id="enrollExpiry" value="2026-12-31">
+                </div>
+            </div>
+            <button onclick="enrollStudent()" style="background-color: #232f3e; width: 100%;"> Enroll Student into System</button>
+            <div id="enrollResult" class="result" style="margin-top: 15px;"></div>
         </div>
 
         <!-- School Profile Section -->
@@ -191,8 +249,9 @@
         const SAVE_LOG_URL = 'https://3n6sennmgib2fc24fz3ynbm5u40zekrs.lambda-url.us-east-1.on.aws/';
         const SAVE_SCHOOL_URL = 'https://4clxwpc6j7hnty44gxusrqvwnu0mqiwl.lambda-url.us-east-1.on.aws/';
         const GENERATE_REPORT_URL = 'https://c746jcx5oxzbwwdct2xmsfy5540cfafy.lambda-url.us-east-1.on.aws/';
+        const ENROLLMENT_LAMBDA_URL = 'https://26xhf3qx3z3r4boqpjpbsv3nsm0tfojd.lambda-url.us-east-1.on.aws/';
 
-        const ADMIN_ID = 'Kwame Mensah'; // Change this to your actual admin name
+        const ADMIN_ID = 'Kwame Mensah';
         let currentStudentId = null;
         let currentQRCode = null;
 
@@ -249,9 +308,9 @@
                     document.getElementById('reportSection').style.display = 'block';
                     
                     if (currentStudentId === ADMIN_ID) {
-                        document.getElementById('qrSection').style.display = 'block';
+                        document.getElementById('adminSection').style.display = 'block';
                     } else {
-                        document.getElementById('qrSection').style.display = 'none';
+                        document.getElementById('adminSection').style.display = 'none';
                     }
                 } else {
                     resultBox.className = 'result error';
@@ -259,7 +318,7 @@
                 }
             } catch (error) {
                 resultBox.className = 'result error';
-                resultBox.innerHTML = `<h3>🔌 Error</h3><p>${error.message}</p>`;
+                resultBox.innerHTML = `<h3> Error</h3><p>${error.message}</p>`;
             }
         }
 
@@ -501,6 +560,54 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+        }
+
+        // --- ADMIN ENROLLMENT FUNCTION ---
+        async function enrollStudent() {
+            const studentData = {
+                admin_id: ADMIN_ID,
+                student_id: document.getElementById('enrollId').value,
+                student_name: document.getElementById('enrollName').value,
+                school_id: document.getElementById('enrollSchool').value,
+                semester: document.getElementById('enrollSemester').value,
+                year: document.getElementById('enrollYear').value,
+                expiry_date: document.getElementById('enrollExpiry').value
+            };
+
+            if (!studentData.student_id || !studentData.student_name) {
+                alert('Please enter Student ID and Name!');
+                return;
+            }
+
+            const resultDiv = document.getElementById('enrollResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result loading';
+            resultDiv.innerHTML = '<p>⏳ Enrolling student...</p>';
+
+            try {
+                const response = await fetch(ENROLLMENT_LAMBDA_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(studentData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `<strong>✅ Success!</strong> ${result.message}`;
+                    // Clear the form
+                    document.getElementById('enrollId').value = '';
+                    document.getElementById('enrollName').value = '';
+                    document.getElementById('enrollSchool').value = '';
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `<strong>❌ Error:</strong> ${result.error}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<strong>🔌 Connection Error:</strong> ${error.message}`;
+            }
         }
     </script>
 </body>
