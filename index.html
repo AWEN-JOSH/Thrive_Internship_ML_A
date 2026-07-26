@@ -45,7 +45,7 @@
 <body>
     <div class="header">
         <h1>AWEN-STS REPORT GENERATOR</h1>
-        <p>Student Teacher Dashboard</p>
+        <p>Student Teacher Dashboard with GPS Attendance Tracking</p>
     </div>
 
     <div class="container">
@@ -73,12 +73,12 @@
             <div id="profileResult" class="result"></div>
         </div>
 
-        <!-- Admin Section (QR Code & Enrollment - Kwame Only) -->
+        <!-- Admin Section (QR Code, Enrollment, GPS Registration - Kwame Only) -->
         <div class="card no-print" id="adminSection" style="display:none; border: 2px solid #ff9900;">
             <h2>👑 Administrator Dashboard (Kwame Mensah Only)</h2>
             
             <!-- Part 1: QR Code Generator -->
-            <h3>📱 Generate Student QR Code</h3>
+            <h3> Generate Student QR Code</h3>
             <div class="form-row">
                 <div class="form-col">
                     <input type="text" id="qrStudentId" placeholder="Enter Student ID to generate QR">
@@ -90,7 +90,7 @@
             <div id="qrDisplay" style="margin-top: 20px; text-align: center; display: none;">
                 <div id="qrcode" style="display: inline-block; padding: 20px; background: white; border: 2px solid #232f3e;"></div>
                 <br>
-                <button onclick="downloadQR()" style="margin-top: 15px; background-color: #28a745;">💾 Download QR Code</button>
+                <button onclick="downloadQR()" style="margin-top: 15px; background-color: #28a745;"> Download QR Code</button>
             </div>
 
             <hr style="margin: 30px 0; border: 0; border-top: 1px solid #ccc;">
@@ -143,6 +143,35 @@
             </div>
             <button onclick="enrollStudent()" style="background-color: #232f3e; width: 100%;"> Enroll Student into System</button>
             <div id="enrollResult" class="result" style="margin-top: 15px;"></div>
+
+            <hr style="margin: 30px 0; border: 0; border-top: 1px solid #ccc;">
+
+            <!-- Part 3: Register School GPS -->
+            <h3> Register Practice School GPS</h3>
+            <p style="color: #666; font-size: 14px;">Visit the school physically, click "Capture GPS", then save.</p>
+            <div class="form-row">
+                <div class="form-col">
+                    <label>School ID (Must match student's assigned school)</label>
+                    <input type="text" id="regSchoolId" placeholder="e.g., St. Mary's JHS">
+                </div>
+                <div class="form-col">
+                    <label>School Full Name</label>
+                    <input type="text" id="regSchoolName" placeholder="e.g., St. Mary's Junior High School">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-col">
+                    <label>Latitude</label>
+                    <input type="number" step="any" id="regLat" placeholder="Auto-filled">
+                </div>
+                <div class="form-col">
+                    <label>Longitude</label>
+                    <input type="number" step="any" id="regLong" placeholder="Auto-filled">
+                </div>
+            </div>
+            <button onclick="captureGPS()" style="background:#17a2b8; width:100%;">📡 Capture My Current GPS (Do this at the school)</button>
+            <button onclick="saveSchoolGPS()" style="background:#232f3e; width:100%; margin-top:10px;">💾 Save School to Registry</button>
+            <div id="regResult" class="result" style="margin-top:15px;"></div>
         </div>
 
         <!-- School Profile Section -->
@@ -194,9 +223,22 @@
             <div id="schoolSaveStatus" class="result"></div>
         </div>
 
-        <!-- Daily SRJ Log Section -->
+        <!-- Daily SRJ Log Section with GPS Attendance -->
         <div class="card no-print" id="srjSection" style="display:none;">
-            <h2>Daily SRJ Log & Class Observation</h2>
+            <h2>Daily SRJ Log & GPS Attendance</h2>
+            
+            <!-- GPS Attendance Check-in/Check-out -->
+            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #2196F3;">
+                <h3 style="margin-top: 0; color: #1976D2;">📍 Daily Attendance Verification</h3>
+                <p>Click Check-In when you arrive at school (8 AM) and Check-Out when you leave (1 PM). GPS location will be verified.</p>
+                <div class="form-row">
+                    <button onclick="verifyAttendance('check_in')" style="background:#28a745; flex:1; font-size: 16px; padding: 15px;">✅ CHECK IN (8 AM)</button>
+                    <button onclick="verifyAttendance('check_out')" style="background:#dc3545; flex:1; font-size: 16px; padding: 15px;"> CHECK OUT (1 PM)</button>
+                </div>
+                <div id="attendanceResult" class="result" style="margin-top:15px;"></div>
+            </div>
+
+            <!-- Week and Day Selection -->
             <div class="form-row">
                 <div class="form-col"><label>Week (1-6)</label><input type="number" id="weekNumber" min="1" max="6" value="1"></div>
                 <div class="form-col"><label>Day (1-5)</label><input type="number" id="dayNumber" min="1" max="5" value="1"></div>
@@ -219,7 +261,7 @@
                 </div>
             </div>
 
-            <button onclick="generateDailySRJ()">Generate Daily SRJ Questions</button>
+            <button onclick="generateDailySRJ()" style="width: 100%;">Generate Daily SRJ Questions</button>
             <div id="srjResult" class="result"></div>
         </div>
 
@@ -250,6 +292,11 @@
         const SAVE_SCHOOL_URL = 'https://4clxwpc6j7hnty44gxusrqvwnu0mqiwl.lambda-url.us-east-1.on.aws/';
         const GENERATE_REPORT_URL = 'https://c746jcx5oxzbwwdct2xmsfy5540cfafy.lambda-url.us-east-1.on.aws/';
         const ENROLLMENT_LAMBDA_URL = 'https://26xhf3qx3z3r4boqpjpbsv3nsm0tfojd.lambda-url.us-east-1.on.aws/';
+        
+        // NEW GPS ATTENDANCE URLs
+        const REGISTER_SCHOOL_GPS_URL = 'https://og76mgg7ocnuzlemfeos46xrl40amnwm.lambda-url.us-east-1.on.aws/';
+        const VERIFY_ATTENDANCE_URL = 'https://eaifacskg2gwtb6m4b6dxleet40caflp.lambda-url.us-east-1.on.aws/';
+        const GET_ATTENDANCE_DASHBOARD_URL = 'https://jqlkrpwgldev5fcbyh5llrkuzu0wrnbb.lambda-url.us-east-1.on.aws/';
 
         const ADMIN_ID = 'Kwame Mensah';
         let currentStudentId = null;
@@ -608,6 +655,113 @@
                 resultDiv.className = 'result error';
                 resultDiv.innerHTML = `<strong>🔌 Connection Error:</strong> ${error.message}`;
             }
+        }
+
+        // --- GPS ATTENDANCE FUNCTIONS ---
+        function captureGPS() {
+            const statusDiv = document.getElementById('regResult');
+            statusDiv.style.display = 'block';
+            statusDiv.className = 'result loading';
+            statusDiv.innerHTML = '<p>📡 Acquiring satellite signal...</p>';
+
+            if (!navigator.geolocation) {
+                statusDiv.className = 'result error';
+                statusDiv.innerHTML = 'Geolocation not supported by your browser.';
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    document.getElementById('regLat').value = position.coords.latitude.toFixed(6);
+                    document.getElementById('regLong').value = position.coords.longitude.toFixed(6);
+                    statusDiv.className = 'result success';
+                    statusDiv.innerHTML = `✅ GPS Captured! Lat: ${position.coords.latitude.toFixed(4)}, Long: ${position.coords.longitude.toFixed(4)}`;
+                },
+                (error) => {
+                    statusDiv.className = 'result error';
+                    statusDiv.innerHTML = `❌ GPS Error: ${error.message}. Please enable location services.`;
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        }
+
+        async function saveSchoolGPS() {
+            const schoolData = {
+                admin_id: ADMIN_ID,
+                school_id: document.getElementById('regSchoolId').value,
+                school_name: document.getElementById('regSchoolName').value,
+                latitude: parseFloat(document.getElementById('regLat').value),
+                longitude: parseFloat(document.getElementById('regLong').value)
+            };
+
+            if (!schoolData.school_id || !schoolData.latitude) {
+                alert('Please enter School ID and capture GPS!');
+                return;
+            }
+
+            const resultDiv = document.getElementById('regResult');
+            resultDiv.innerHTML = '<p>⏳ Saving school...</p>';
+
+            try {
+                const response = await fetch(REGISTER_SCHOOL_GPS_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(schoolData)
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `<strong>✅ Success!</strong> ${schoolData.school_name} registered with GPS.`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `<strong>❌ Error:</strong> ${result.error}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<strong>🔌 Error:</strong> ${error.message}`;
+            }
+        }
+
+        async function verifyAttendance(action) {
+            const div = document.getElementById('attendanceResult');
+            div.style.display = 'block';
+            div.className = 'result loading';
+            div.innerHTML = '<p>📡 Getting GPS location...</p>';
+
+            if (!navigator.geolocation) { 
+                div.className = 'result error';
+                div.innerHTML = 'GPS not supported by your browser.';
+                return; 
+            }
+            
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                div.innerHTML = '<p> Verifying location...</p>';
+                const res = await fetch(VERIFY_ATTENDANCE_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        student_id: currentStudentId,
+                        action: action,
+                        latitude: pos.coords.latitude,
+                        longitude: pos.coords.longitude,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+                const data = await res.json();
+                if (res.ok && data.verified) {
+                    div.className = 'result success';
+                    div.innerHTML = `✅ <strong>VERIFIED!</strong> You are ${data.distance}m from your assigned school.<br>Time: ${new Date().toLocaleTimeString()}`;
+                } else if (res.ok && !data.verified) {
+                    div.className = 'result error';
+                    div.innerHTML = `⚠️ <strong>LOCATION MISMATCH!</strong> You are ${data.distance}m away from your assigned school. Coordinator notified.`;
+                } else {
+                    div.className = 'result error';
+                    div.innerHTML = `❌ Error: ${data.error}`;
+                }
+            }, (err) => {
+                div.className = 'result error';
+                div.innerHTML = '❌ Please enable Location Services on your phone!';
+            }, {enableHighAccuracy: true});
         }
     </script>
 </body>
