@@ -137,6 +137,16 @@
                     </select>
                 </div>
                 <div class="form-col">
+                    <label>Weekly Visit Day</label>
+                    <select id="enrollVisitDay">
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                    </select>
+                </div>
+                <div class="form-col">
                     <label>Expiry Date</label>
                     <input type="date" id="enrollExpiry" value="2026-12-31">
                 </div>
@@ -172,6 +182,28 @@
             <button onclick="captureGPS()" style="background:#17a2b8; width:100%;">📡 Capture My Current GPS (Do this at the school)</button>
             <button onclick="saveSchoolGPS()" style="background:#232f3e; width:100%; margin-top:10px;">💾 Save School to Registry</button>
             <div id="regResult" class="result" style="margin-top:15px;"></div>
+
+            <hr style="margin: 30px 0; border: 0; border-top: 1px solid #ccc;">
+
+            <!-- Part 4: Register New Coordinator -->
+            <h3>👨‍🏫 Register New Coordinator</h3>
+            <p>Create coordinator account (valid for 1 year)</p>
+            <div class="form-row">
+                <div class="form-col">
+                    <label>Coordinator ID</label>
+                    <input type="text" id="coordId" placeholder="e.g., coord_stmarys">
+                </div>
+                <div class="form-col">
+                    <label>Password</label>
+                    <input type="password" id="coordPassword" placeholder="Password">
+                </div>
+                <div class="form-col">
+                    <label>School ID</label>
+                    <input type="text" id="coordSchool" placeholder="e.g., St. Mary's JHS">
+                </div>
+            </div>
+            <button onclick="registerCoordinator()" style="background: #17a2b8; width:100%;">Register Coordinator</button>
+            <div id="coordResult" class="result" style="margin-top: 15px;"></div>
         </div>
 
         <!-- School Profile Section -->
@@ -238,6 +270,18 @@
                 <div id="attendanceResult" class="result" style="margin-top:15px;"></div>
             </div>
 
+            <!-- 11 AM Photo Capture -->
+            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ffc107;">
+                <h3 style="margin-top: 0; color: #856404;">📸 11 AM Attendance Photo</h3>
+                <p>At 10:30 AM to 12:00 PM, capture a selfie to confirm your presence at school.</p>
+                <button onclick="captureAttendancePhoto()" id="photoBtn" style="background: #ffc107; width: 100%; font-size: 18px; padding: 15px;">
+                     Capture Attendance Photo (10:30 AM - 12:00 PM)
+                </button>
+                <div id="photoResult" class="result" style="margin-top: 15px;"></div>
+                <video id="camera" style="display: none; width: 100%; max-width: 400px; margin-top: 10px;" autoplay></video>
+                <canvas id="canvas" style="display: none;"></canvas>
+            </div>
+
             <!-- Week and Day Selection -->
             <div class="form-row">
                 <div class="form-col"><label>Week (1-6)</label><input type="number" id="weekNumber" min="1" max="6" value="1"></div>
@@ -297,6 +341,12 @@
         const REGISTER_SCHOOL_GPS_URL = 'https://og76mgg7ocnuzlemfeos46xrl40amnwm.lambda-url.us-east-1.on.aws/';
         const VERIFY_ATTENDANCE_URL = 'https://eaifacskg2gwtb6m4b6dxleet40caflp.lambda-url.us-east-1.on.aws/';
         const GET_ATTENDANCE_DASHBOARD_URL = 'https://jqlkrpwgldev5fcbyh5llrkuzu0wrnbb.lambda-url.us-east-1.on.aws/';
+        
+        // COORDINATOR URLS
+        const REGISTER_COORDINATOR_URL = 'https://7su73m5h6ivzc7ktlluzjxsyku0fepzv.lambda-url.us-east-1.on.aws/';
+        const COORDINATOR_LOGIN_URL = 'https://gzduysxv7ddbaklpe7b3wdwl7i0jgshn.lambda-url.us-east-1.on.aws/';
+        const CAPTURE_ATTENDANCE_PHOTO_URL = 'https://6dfe6z75yohubbexchkohxs3ca0cerpc.lambda-url.us-east-1.on.aws/';
+        const GET_COORDINATOR_DASHBOARD_URL = 'https://rb2wxcvtgxemegalw7vxqqw5qm0ggzbf.lambda-url.us-east-1.on.aws/';
 
         const ADMIN_ID = 'Kwame Mensah';
         let currentStudentId = null;
@@ -618,6 +668,7 @@
                 school_id: document.getElementById('enrollSchool').value,
                 semester: document.getElementById('enrollSemester').value,
                 year: document.getElementById('enrollYear').value,
+                visit_day: document.getElementById('enrollVisitDay').value,
                 expiry_date: document.getElementById('enrollExpiry').value
             };
 
@@ -647,6 +698,42 @@
                     document.getElementById('enrollId').value = '';
                     document.getElementById('enrollName').value = '';
                     document.getElementById('enrollSchool').value = '';
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `<strong>❌ Error:</strong> ${result.error}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<strong>🔌 Connection Error:</strong> ${error.message}`;
+            }
+        }
+
+        // --- COORDINATOR REGISTRATION ---
+        async function registerCoordinator() {
+            const data = {
+                admin_id: ADMIN_ID,
+                coordinator_id: document.getElementById('coordId').value,
+                password: document.getElementById('coordPassword').value,
+                school_id: document.getElementById('coordSchool').value
+            };
+
+            const resultDiv = document.getElementById('coordResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result loading';
+            resultDiv.innerHTML = '<p>Registering coordinator...</p>';
+
+            try {
+                const response = await fetch(REGISTER_COORDINATOR_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `<strong>✅ Success!</strong> Coordinator registered successfully!`;
                 } else {
                     resultDiv.className = 'result error';
                     resultDiv.innerHTML = `<strong>❌ Error:</strong> ${result.error}`;
@@ -762,6 +849,87 @@
                 div.className = 'result error';
                 div.innerHTML = '❌ Please enable Location Services on your phone!';
             }, {enableHighAccuracy: true});
+        }
+
+        async function captureAttendancePhoto() {
+            const resultDiv = document.getElementById('photoResult');
+            const video = document.getElementById('camera');
+            const canvas = document.getElementById('canvas');
+            const photoBtn = document.getElementById('photoBtn');
+            
+            // Check if time is between 10:30 AM and 12:00 PM (noon)
+            const now = new Date();
+            const hour = now.getHours();
+            const minute = now.getMinutes();
+            const currentMinutes = hour * 60 + minute;
+            const startMinutes = 10 * 60 + 30;  // 10:30 AM
+            const endMinutes = 12 * 60;          // 12:00 PM
+            
+            if (currentMinutes < startMinutes || currentMinutes > endMinutes) {
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<strong>⚠️ Wrong Time!</strong> Photo capture only allowed between 10:30 AM and 12:00 PM.<br>Current time: ${hour}:${minute.toString().padStart(2, '0')}`;
+                return;
+            }
+
+            try {
+                // Access camera
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.style.display = 'block';
+                video.srcObject = stream;
+                
+                photoBtn.textContent = 'Taking photo in 3 seconds...';
+                photoBtn.disabled = true;
+
+                // Wait 3 seconds then capture
+                setTimeout(async () => {
+                    const context = canvas.getContext('2d');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    context.drawImage(video, 0, 0);
+                    
+                    // Convert to base64
+                    const photoData = canvas.toDataURL('image/jpeg');
+                    
+                    // Stop camera
+                    stream.getTracks().forEach(track => track.stop());
+                    video.style.display = 'none';
+                    
+                    // Upload to server
+                    resultDiv.innerHTML = '<p>Uploading photo...</p>';
+                    resultDiv.style.display = 'block';
+                    resultDiv.className = 'result loading';
+
+                    const response = await fetch(CAPTURE_ATTENDANCE_PHOTO_URL, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            student_id: currentStudentId,
+                            photo_data: photoData,
+                            week: parseInt(document.getElementById('weekNumber').value),
+                            day: parseInt(document.getElementById('dayNumber').value)
+                        })
+                    });
+
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        resultDiv.className = 'result success';
+                        resultDiv.innerHTML = `<strong>✅ Photo Captured!</strong><br>Your attendance at ${hour}:${minute.toString().padStart(2, '0')} has been verified.`;
+                    } else {
+                        resultDiv.className = 'result error';
+                        resultDiv.innerHTML = `<strong>❌ Error:</strong> ${result.error}`;
+                    }
+                    
+                    photoBtn.textContent = '📷 Capture Attendance Photo (10:30 AM - 12:00 PM)';
+                    photoBtn.disabled = false;
+                }, 3000);
+
+            } catch (error) {
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<strong>❌ Camera Error:</strong> ${error.message}. Please allow camera access.`;
+            }
         }
     </script>
 </body>
