@@ -73,7 +73,7 @@
             <div id="profileResult" class="result"></div>
         </div>
 
-        <!-- Admin Section (QR Code, Enrollment, GPS Registration - Kwame Only) -->
+        <!-- Admin Section -->
         <div class="card no-print" id="adminSection" style="display:none; border: 2px solid #ff9900;">
             <h2>👑 Administrator Dashboard (Kwame Mensah Only)</h2>
             
@@ -179,14 +179,14 @@
                     <input type="number" step="any" id="regLong" placeholder="Auto-filled">
                 </div>
             </div>
-            <button onclick="captureGPS()" style="background:#17a2b8; width:100%;">📡 Capture My Current GPS (Do this at the school)</button>
+            <button onclick="captureGPS()" style="background:#17a2b8; width:100%;"> Capture My Current GPS (Do this at the school)</button>
             <button onclick="saveSchoolGPS()" style="background:#232f3e; width:100%; margin-top:10px;">💾 Save School to Registry</button>
             <div id="regResult" class="result" style="margin-top:15px;"></div>
 
             <hr style="margin: 30px 0; border: 0; border-top: 1px solid #ccc;">
 
             <!-- Part 4: Register New Coordinator -->
-            <h3>👨‍🏫 Register New Coordinator</h3>
+            <h3>‍🏫 Register New Coordinator</h3>
             <p>Create coordinator account (valid for 1 year)</p>
             <div class="form-row">
                 <div class="form-col">
@@ -289,7 +289,7 @@
             </div>
             
             <!-- Daily Class Observation -->
-            <h3>📚 Today's Class Observation</h3>
+            <h3> Today's Class Observation</h3>
             <div class="form-row">
                 <div class="form-col">
                     <label>Class Observed</label>
@@ -313,7 +313,7 @@
         <div class="card no-print" id="reportSection" style="display:none;">
             <h2>🎓 Generate Final Internship Report</h2>
             <p>Click the button below to generate your comprehensive 5-Chapter internship report.</p>
-            <button onclick="generateFinalReport()" class="large" style="background-color: #28a745; font-size: 20px;">📄 Generate Complete Report</button>
+            <button onclick="generateFinalReport()" class="large" style="background-color: #28a745; font-size: 20px;"> Generate Complete Report</button>
             <div id="reportStatus" class="result"></div>
         </div>
 
@@ -342,7 +342,7 @@
         const VERIFY_ATTENDANCE_URL = 'https://eaifacskg2gwtb6m4b6dxleet40caflp.lambda-url.us-east-1.on.aws/';
         const GET_ATTENDANCE_DASHBOARD_URL = 'https://jqlkrpwgldev5fcbyh5llrkuzu0wrnbb.lambda-url.us-east-1.on.aws/';
         
-        // COORDINATOR URLS
+        // COORDINATOR URLS - UPDATED
         const REGISTER_COORDINATOR_URL = 'https://7su73m5h6ivzc7ktlluzjxsyku0fepzv.lambda-url.us-east-1.on.aws/';
         const COORDINATOR_LOGIN_URL = 'https://gzduysxv7ddbaklpe7b3wdwl7i0jgshn.lambda-url.us-east-1.on.aws/';
         const CAPTURE_ATTENDANCE_PHOTO_URL = 'https://6dfe6z75yohubbexchkohxs3ca0cerpc.lambda-url.us-east-1.on.aws/';
@@ -532,7 +532,7 @@
                 
                 if (response.ok) {
                     resultBox.className = 'result success';
-                    let html = `<h3>📚 Semester ${semester} | Week ${week}, Day ${day}</h3>`;
+                    let html = `<h3> Semester ${semester} | Week ${week}, Day ${day}</h3>`;
                     html += `<div class="srj-item"><h4>📝 Reflective Questions:</h4>`;
                     if (Array.isArray(data.srj_questions)) {
                         data.srj_questions.forEach((q, i) => {
@@ -680,7 +680,7 @@
             const resultDiv = document.getElementById('enrollResult');
             resultDiv.style.display = 'block';
             resultDiv.className = 'result loading';
-            resultDiv.innerHTML = '<p>⏳ Enrolling student...</p>';
+            resultDiv.innerHTML = '<p> Enrolling student...</p>';
 
             try {
                 const response = await fetch(ENROLLMENT_LAMBDA_URL, {
@@ -700,7 +700,7 @@
                     document.getElementById('enrollSchool').value = '';
                 } else {
                     resultDiv.className = 'result error';
-                    resultDiv.innerHTML = `<strong>❌ Error:</strong> ${result.error}`;
+                    resultDiv.innerHTML = `<strong> Error:</strong> ${result.error}`;
                 }
             } catch (error) {
                 resultDiv.className = 'result error';
@@ -708,7 +708,7 @@
             }
         }
 
-        // --- COORDINATOR REGISTRATION ---
+        // --- COORDINATOR REGISTRATION (UPDATED WITH CORS FIX) ---
         async function registerCoordinator() {
             const data = {
                 admin_id: ADMIN_ID,
@@ -725,22 +725,32 @@
             try {
                 const response = await fetch(REGISTER_COORDINATOR_URL, {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
                     body: JSON.stringify(data)
                 });
 
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const result = await response.json();
                 
-                if (response.ok) {
-                    resultDiv.className = 'result success';
-                    resultDiv.innerHTML = `<strong>✅ Success!</strong> Coordinator registered successfully!`;
-                } else {
-                    resultDiv.className = 'result error';
-                    resultDiv.innerHTML = `<strong>❌ Error:</strong> ${result.error}`;
-                }
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML = `<strong>✅ Success!</strong> ${result.message}<br>Expiry: ${result.expiry_date}`;
+                
+                // Clear form
+                document.getElementById('coordId').value = '';
+                document.getElementById('coordPassword').value = '';
+                document.getElementById('coordSchool').value = '';
+                
             } catch (error) {
+                console.error('Registration error:', error);
                 resultDiv.className = 'result error';
-                resultDiv.innerHTML = `<strong>🔌 Connection Error:</strong> ${error.message}`;
+                resultDiv.innerHTML = `<strong> Connection Error:</strong> ${error.message}<br><small>Check: 1) Lambda URL is correct 2) CORS is enabled 3) Lambda has proper permissions</small>`;
             }
         }
 
@@ -928,7 +938,7 @@
             } catch (error) {
                 resultDiv.style.display = 'block';
                 resultDiv.className = 'result error';
-                resultDiv.innerHTML = `<strong>❌ Camera Error:</strong> ${error.message}. Please allow camera access.`;
+                resultDiv.innerHTML = `<strong> Camera Error:</strong> ${error.message}. Please allow camera access.`;
             }
         }
     </script>
