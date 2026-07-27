@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coordinator Login - AWEN-STS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .login-container { 
+            background: white; 
+            padding: 40px; 
+            border-radius: 15px; 
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+            max-width: 450px;
+            width: 100%;
+        }
+        h1 { 
+            text-align: center; 
+            color: #232f3e; 
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 14px;
+        }
+        input { 
+            width: 100%; 
+            padding: 14px; 
+            border: 2px solid #ddd; 
+            border-radius: 8px; 
+            font-size: 15px;
+            transition: border 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button { 
+            width: 100%; 
+            padding: 15px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 16px; 
+            font-weight: bold;
+            cursor: pointer; 
+            margin-top: 10px;
+            transition: transform 0.2s;
+        }
+        button:hover { 
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .error { 
+            color: #dc3545; 
+            margin-top: 15px; 
+            text-align: center; 
+            padding: 10px;
+            background: #fdecea;
+            border-radius: 5px;
+            display: none;
+        }
+        .back-link { 
+            text-align: center; 
+            margin-top: 25px; 
+        }
+        .back-link a { 
+            color: #667eea; 
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        .info-box {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #2196F3;
+        }
+        .info-box p {
+            color: #1976D2;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>👨‍🏫 Coordinator Login</h1>
+        <p class="subtitle">AWEN-STS Report Generator System</p>
+        
+        <div class="info-box">
+            <p><strong>️ Note:</strong> This login is for school coordinators only. Your account is valid for 1 year from registration date.</p>
+        </div>
+
+        <div class="input-group">
+            <label for="coordinatorId">Coordinator ID</label>
+            <input type="text" id="coordinatorId" placeholder="Enter your Coordinator ID">
+        </div>
+
+        <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter your password">
+        </div>
+
+        <button onclick="coordinatorLogin()">Login to Dashboard</button>
+        
+        <div id="errorMsg" class="error"></div>
+        
+        <div class="back-link">
+            <a href="/">← Back to Student Login</a>
+        </div>
+    </div>
+
+    <script>
+        const COORDINATOR_LOGIN_URL = 'https://gzduysxv7ddbaklpe7b3wdwl7i0jgshn.lambda-url.us-east-1.on.aws/';
+
+        async function coordinatorLogin() {
+            const coordId = document.getElementById('coordinatorId').value.trim();
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMsg');
+
+            // Validation
+            if (!coordId || !password) {
+                errorMsg.textContent = '️ Please enter both Coordinator ID and Password';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            errorMsg.style.display = 'none';
+            const btn = document.querySelector('button');
+            const originalText = btn.textContent;
+            btn.textContent = 'Logging in...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(COORDINATOR_LOGIN_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        coordinator_id: coordId,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Store coordinator info in localStorage
+                    localStorage.setItem('coordinator', JSON.stringify({
+                        coordinator_id: data.coordinator_id,
+                        school_id: data.school_id,
+                        expiry_date: data.expiry_date,
+                        login_time: new Date().toISOString()
+                    }));
+                    
+                    // Redirect to dashboard
+                    window.location.href = 'coordinator-dashboard.html';
+                } else {
+                    errorMsg.textContent = '❌ ' + data.error;
+                    errorMsg.style.display = 'block';
+                }
+            } catch (error) {
+                errorMsg.textContent = '🔌 Connection error: ' + error.message + '. Please check your internet connection.';
+                errorMsg.style.display = 'block';
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // Allow Enter key to submit
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                coordinatorLogin();
+            }
+        });
+    </script>
+</body>
+</html>
