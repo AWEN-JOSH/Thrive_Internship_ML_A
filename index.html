@@ -78,7 +78,7 @@
             <h2>👑 Administrator Dashboard (Kwame Mensah Only)</h2>
             
             <!-- Part 1: QR Code Generator -->
-            <h3> Generate Student QR Code</h3>
+            <h3>📱 Generate Student QR Code</h3>
             <div class="form-row">
                 <div class="form-col">
                     <input type="text" id="qrStudentId" placeholder="Enter Student ID to generate QR">
@@ -90,13 +90,13 @@
             <div id="qrDisplay" style="margin-top: 20px; text-align: center; display: none;">
                 <div id="qrcode" style="display: inline-block; padding: 20px; background: white; border: 2px solid #232f3e;"></div>
                 <br>
-                <button onclick="downloadQR()" style="margin-top: 15px; background-color: #28a745;"> Download QR Code</button>
+                <button onclick="downloadQR()" style="margin-top: 15px; background-color: #28a745;">💾 Download QR Code</button>
             </div>
 
             <hr style="margin: 30px 0; border: 0; border-top: 1px solid #ccc;">
 
             <!-- Part 2: Student Enrollment Form -->
-            <h3> Enroll New Student</h3>
+            <h3>📝 Enroll New Student</h3>
             <div class="form-row">
                 <div class="form-col">
                     <label>Student ID (Login Name) *</label>
@@ -151,13 +151,13 @@
                     <input type="date" id="enrollExpiry" value="2026-12-31">
                 </div>
             </div>
-            <button onclick="enrollStudent()" style="background-color: #232f3e; width: 100%;"> Enroll Student into System</button>
+            <button onclick="enrollStudent()" style="background-color: #232f3e; width: 100%;">💾 Enroll Student into System</button>
             <div id="enrollResult" class="result" style="margin-top: 15px;"></div>
 
             <hr style="margin: 30px 0; border: 0; border-top: 1px solid #ccc;">
 
             <!-- Part 3: Register School GPS -->
-            <h3> Register Practice School GPS</h3>
+            <h3>📍 Register Practice School GPS</h3>
             <p style="color: #666; font-size: 14px;">Visit the school physically, click "Capture GPS", then save.</p>
             <div class="form-row">
                 <div class="form-col">
@@ -179,14 +179,14 @@
                     <input type="number" step="any" id="regLong" placeholder="Auto-filled">
                 </div>
             </div>
-            <button onclick="captureGPS()" style="background:#17a2b8; width:100%;"> Capture My Current GPS (Do this at the school)</button>
+            <button onclick="captureGPS()" style="background:#17a2b8; width:100%;">📡 Capture My Current GPS (Do this at the school)</button>
             <button onclick="saveSchoolGPS()" style="background:#232f3e; width:100%; margin-top:10px;">💾 Save School to Registry</button>
             <div id="regResult" class="result" style="margin-top:15px;"></div>
 
             <hr style="margin: 30px 0; border: 0; border-top: 1px solid #ccc;">
 
             <!-- Part 4: Register New Coordinator -->
-            <h3>‍ Register New Coordinator</h3>
+            <h3>👨‍🏫 Register New Coordinator</h3>
             <p>Create coordinator account (valid for 1 year)</p>
             <div class="form-row">
                 <div class="form-col">
@@ -221,9 +221,7 @@
             <textarea id="mission_statement" rows="2" placeholder="Mission Statement"></textarea>
             <textarea id="vision_statement" rows="2" placeholder="Vision Statement"></textarea>
             <textarea id="core_values" rows="2" placeholder="Core Values (comma separated)"></textarea>
-            
-            <!-- School Facilities Field -->
-            <textarea id="school_facilities" rows="3" placeholder="List of School Facilities (e.g., Library, Computer Lab, Science Lab, Sports Field, Assembly Hall, etc.)"></textarea>
+            <textarea id="school_facilities" rows="3" placeholder="List of School Facilities (e.g., Library, Computer Lab, Science Lab, Sports Field, etc.)"></textarea>
 
             <h3>2. Teaching Staff Breakdown</h3>
             <div class="form-row">
@@ -259,37 +257,33 @@
         <div class="card no-print" id="srjSection" style="display:none;">
             <h2>Daily SRJ Log & GPS Attendance</h2>
             
-            <!-- GPS Attendance Check-in/Check-out -->
             <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #2196F3;">
                 <h3 style="margin-top: 0; color: #1976D2;">📍 Daily Attendance Verification</h3>
                 <p>Click Check-In when you arrive at school (8 AM) and Check-Out when you leave (1 PM). GPS location will be verified.</p>
                 <div class="form-row">
                     <button onclick="verifyAttendance('check_in')" style="background:#28a745; flex:1; font-size: 16px; padding: 15px;">✅ CHECK IN (8 AM)</button>
-                    <button onclick="verifyAttendance('check_out')" style="background:#dc3545; flex:1; font-size: 16px; padding: 15px;"> CHECK OUT (1 PM)</button>
+                    <button onclick="verifyAttendance('check_out')" style="background:#dc3545; flex:1; font-size: 16px; padding: 15px;">🔴 CHECK OUT (1 PM)</button>
                 </div>
                 <div id="attendanceResult" class="result" style="margin-top:15px;"></div>
             </div>
 
-            <!-- 11 AM Photo Capture -->
             <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ffc107;">
                 <h3 style="margin-top: 0; color: #856404;">📸 11 AM Attendance Photo</h3>
                 <p>At 10:30 AM to 12:00 PM, capture a selfie to confirm your presence at school.</p>
                 <button onclick="captureAttendancePhoto()" id="photoBtn" style="background: #ffc107; width: 100%; font-size: 18px; padding: 15px;">
-                     Capture Attendance Photo (10:30 AM - 12:00 PM)
+                    📷 Capture Attendance Photo (10:30 AM - 12:00 PM)
                 </button>
                 <div id="photoResult" class="result" style="margin-top: 15px;"></div>
                 <video id="camera" style="display: none; width: 100%; max-width: 400px; margin-top: 10px;" autoplay></video>
                 <canvas id="canvas" style="display: none;"></canvas>
             </div>
 
-            <!-- Week and Day Selection -->
             <div class="form-row">
                 <div class="form-col"><label>Week (1-6)</label><input type="number" id="weekNumber" min="1" max="6" value="1"></div>
                 <div class="form-col"><label>Day (1-5)</label><input type="number" id="dayNumber" min="1" max="5" value="1"></div>
             </div>
             
-            <!-- Daily Class Observation -->
-            <h3> Today's Class Observation</h3>
+            <h3>📚 Today's Class Observation</h3>
             <div class="form-row">
                 <div class="form-col">
                     <label>Class Observed</label>
@@ -313,14 +307,14 @@
         <div class="card no-print" id="reportSection" style="display:none;">
             <h2>🎓 Generate Final Internship Report</h2>
             <p>Click the button below to generate your comprehensive 5-Chapter internship report.</p>
-            <button onclick="generateFinalReport()" class="large" style="background-color: #28a745; font-size: 20px;"> Generate Complete Report</button>
+            <button onclick="generateFinalReport()" class="large" style="background-color: #28a745; font-size: 20px;">📄 Generate Complete Report</button>
             <div id="reportStatus" class="result"></div>
         </div>
 
         <!-- Report Display Section -->
         <div id="reportDisplay">
             <div class="no-print" style="text-align: right; margin-bottom: 20px;">
-                <button onclick="window.print()" style="background: #232f3e;">️ Print Report</button>
+                <button onclick="window.print()" style="background: #232f3e;">🖨️ Print Report</button>
                 <button onclick="downloadReport()" style="background: #28a745;">💾 Download as HTML</button>
                 <button onclick="document.getElementById('reportDisplay').style.display='none'" style="background: #f44336;">Close</button>
             </div>
@@ -337,12 +331,10 @@
         const GENERATE_REPORT_URL = 'https://c746jcx5oxzbwwdct2xmsfy5540cfafy.lambda-url.us-east-1.on.aws/';
         const ENROLLMENT_LAMBDA_URL = 'https://26xhf3qx3z3r4boqpjpbsv3nsm0tfojd.lambda-url.us-east-1.on.aws/';
         
-        // NEW GPS ATTENDANCE URLs
         const REGISTER_SCHOOL_GPS_URL = 'https://og76mgg7ocnuzlemfeos46xrl40amnwm.lambda-url.us-east-1.on.aws/';
         const VERIFY_ATTENDANCE_URL = 'https://eaifacskg2gwtb6m4b6dxleet40caflp.lambda-url.us-east-1.on.aws/';
         const GET_ATTENDANCE_DASHBOARD_URL = 'https://jqlkrpwgldev5fcbyh5llrkuzu0wrnbb.lambda-url.us-east-1.on.aws/';
         
-        // COORDINATOR URLS - CORRECTED
         const REGISTER_COORDINATOR_URL = 'https://7su73m5h6ivzc7ktlluzjxsyku0fepzv.lambda-url.us-east-1.on.aws/';
         const COORDINATOR_LOGIN_URL = 'https://gzduysxv7ddbaklpe7b3wdwl7i0jgshn.lambda-url.us-east-1.on.aws/';
         const CAPTURE_ATTENDANCE_PHOTO_URL = 'https://6dfe6z75yohubbexchkohxs3ca0cerpc.lambda-url.us-east-1.on.aws/';
@@ -383,16 +375,13 @@
 
             resultBox.style.display = 'block';
             resultBox.className = 'result loading';
-            resultBox.innerHTML = '<p> Checking...</p>';
+            resultBox.innerHTML = '<p>⏳ Checking...</p>';
 
             try {
                 const response = await fetch(CHECK_STATUS_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        student_id: studentId,
-                        semester: semester 
-                    })
+                    body: JSON.stringify({ student_id: studentId, semester: semester })
                 });
                 const data = await response.json();
                 
@@ -415,7 +404,7 @@
                 }
             } catch (error) {
                 resultBox.className = 'result error';
-                resultBox.innerHTML = `<h3> Error</h3><p>${error.message}</p>`;
+                resultBox.innerHTML = `<h3>🔌 Error</h3><p>${error.message}</p>`;
             }
         }
 
@@ -515,24 +504,19 @@
             
             resultBox.style.display = 'block';
             resultBox.className = 'result loading';
-            resultBox.innerHTML = `<p> Generating unique questions for Sem ${semester}, Week ${week}, Day ${day}...</p>`;
+            resultBox.innerHTML = `<p>🤖 Generating unique questions for Sem ${semester}, Week ${week}, Day ${day}...</p>`;
 
             try {
                 const response = await fetch(GENERATE_SRJ_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        student_id: currentStudentId, 
-                        week: parseInt(week), 
-                        day: parseInt(day),
-                        semester: parseInt(semester)
-                    })
+                    body: JSON.stringify({ student_id: currentStudentId, week: parseInt(week), day: parseInt(day), semester: parseInt(semester) })
                 });
                 const data = await response.json();
                 
                 if (response.ok) {
                     resultBox.className = 'result success';
-                    let html = `<h3> Semester ${semester} | Week ${week}, Day ${day}</h3>`;
+                    let html = `<h3>📚 Semester ${semester} | Week ${week}, Day ${day}</h3>`;
                     html += `<div class="srj-item"><h4>📝 Reflective Questions:</h4>`;
                     if (Array.isArray(data.srj_questions)) {
                         data.srj_questions.forEach((q, i) => {
@@ -541,7 +525,6 @@
                         });
                     }
                     html += `</div>`;
-                    
                     html += `<div class="srj-item"><h4>✅ Observation Checklist:</h4>`;
                     if (Array.isArray(data.checklist)) {
                         data.checklist.forEach((item, i) => {
@@ -549,7 +532,6 @@
                         });
                     }
                     html += `</div>`;
-                    
                     html += `<button onclick="saveDailyLog(${week}, ${day})" style="background:#28a745; width:100%; font-size:18px;">💾 Save Daily Log & Observation</button><div id="logStatus"></div>`;
                     resultBox.innerHTML = html;
                 } else {
@@ -558,7 +540,7 @@
                 }
             } catch (error) {
                 resultBox.className = 'result error';
-                resultBox.innerHTML = `<h3> Error</h3><p>${error.message}</p>`;
+                resultBox.innerHTML = `<h3>🔌 Error</h3><p>${error.message}</p>`;
             }
         }
 
@@ -568,13 +550,11 @@
                 const ans = document.getElementById(`srj-ans-${i}`);
                 if(ans && ans.value) srjAnswers.push({q: i+1, answer: ans.value});
             }
-            
             const checklist = [];
             for(let i=0; i<4; i++) {
                 const chk = document.getElementById(`chk-${i}`);
                 if(chk) checklist.push({item: chk.nextSibling.textContent, done: chk.checked});
             }
-
             const observation = {
                 class_observed: document.getElementById('obsClass').value,
                 subject_taught: document.getElementById('obsSubject').value,
@@ -588,13 +568,7 @@
                 const res = await fetch(SAVE_LOG_URL, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        student_id: currentStudentId,
-                        week: week, day: day,
-                        observation: observation,
-                        srj_answers: srjAnswers,
-                        checklist: checklist
-                    })
+                    body: JSON.stringify({ student_id: currentStudentId, week: week, day: day, observation: observation, srj_answers: srjAnswers, checklist: checklist })
                 });
                 const result = await res.json();
                 if(res.ok) {
@@ -616,7 +590,7 @@
             
             statusDiv.style.display = 'block';
             statusDiv.className = 'result loading';
-            statusDiv.innerHTML = '<h3> Generating your comprehensive report...</h3><p>Please wait...</p>';
+            statusDiv.innerHTML = '<h3>🤖 Generating your comprehensive report...</h3><p>Please wait...</p>';
             
             try {
                 const response = await fetch(GENERATE_REPORT_URL, {
@@ -659,7 +633,6 @@
             URL.revokeObjectURL(url);
         }
 
-        // --- ADMIN ENROLLMENT FUNCTION ---
         async function enrollStudent() {
             const studentData = {
                 admin_id: ADMIN_ID,
@@ -680,7 +653,7 @@
             const resultDiv = document.getElementById('enrollResult');
             resultDiv.style.display = 'block';
             resultDiv.className = 'result loading';
-            resultDiv.innerHTML = '<p> Enrolling student...</p>';
+            resultDiv.innerHTML = '<p>⏳ Enrolling student...</p>';
 
             try {
                 const response = await fetch(ENROLLMENT_LAMBDA_URL, {
@@ -688,19 +661,16 @@
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(studentData)
                 });
-
                 const result = await response.json();
-                
                 if (response.ok) {
                     resultDiv.className = 'result success';
                     resultDiv.innerHTML = `<strong>✅ Success!</strong> ${result.message}`;
-                    // Clear the form
                     document.getElementById('enrollId').value = '';
                     document.getElementById('enrollName').value = '';
                     document.getElementById('enrollSchool').value = '';
                 } else {
                     resultDiv.className = 'result error';
-                    resultDiv.innerHTML = `<strong> Error:</strong> ${result.error}`;
+                    resultDiv.innerHTML = `<strong>❌ Error:</strong> ${result.error}`;
                 }
             } catch (error) {
                 resultDiv.className = 'result error';
@@ -708,7 +678,7 @@
             }
         }
 
-        // --- COORDINATOR REGISTRATION (FIXED) ---
+        // --- COORDINATOR REGISTRATION (FINAL FIX) ---
         async function registerCoordinator() {
             const data = {
                 admin_id: ADMIN_ID,
@@ -723,8 +693,7 @@
             resultDiv.innerHTML = '<p>Registering coordinator...</p>';
 
             try {
-                console.log('Coordinator Registration:');
-                console.log('URL:', REGISTER_COORDINATOR_URL);
+                console.log('Sending request to Lambda...');
                 console.log('Data:', data);
                 
                 const response = await fetch(REGISTER_COORDINATOR_URL, {
@@ -736,32 +705,38 @@
                 });
 
                 console.log('Response status:', response.status);
+                const responseText = await response.text();
+                console.log('Response text:', responseText);
                 
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('Error response:', errorText);
-                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                // Try to parse as JSON
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (e) {
+                    console.error('Failed to parse JSON:', e);
+                    throw new Error('Invalid response from server');
                 }
-
-                const result = await response.json();
-                console.log('Success response:', result);
                 
-                resultDiv.className = 'result success';
-                resultDiv.innerHTML = `<strong>✅ Success!</strong> ${result.message}<br>Expiry: ${result.expiry_date}`;
-                
-                // Clear form
-                document.getElementById('coordId').value = '';
-                document.getElementById('coordPassword').value = '';
-                document.getElementById('coordSchool').value = '';
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `<strong>✅ Success!</strong> ${result.message}<br>Expiry: ${result.expiry_date}`;
+                    
+                    // Clear form
+                    document.getElementById('coordId').value = '';
+                    document.getElementById('coordPassword').value = '';
+                    document.getElementById('coordSchool').value = '';
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `<strong>❌ Error:</strong> ${result.error || 'Unknown error'}`;
+                }
                 
             } catch (error) {
                 console.error('Registration error:', error);
                 resultDiv.className = 'result error';
-                resultDiv.innerHTML = `<strong> Connection Error:</strong> ${error.message}<br><small>Check browser console (F12) for details.</small>`;
+                resultDiv.innerHTML = `<strong>❌ Connection Error:</strong> ${error.message}<br><small>Check browser console (F12) for details. Make sure Lambda URL is correct and CORS is enabled.</small>`;
             }
         }
 
-        // --- GPS ATTENDANCE FUNCTIONS ---
         function captureGPS() {
             const statusDiv = document.getElementById('regResult');
             statusDiv.style.display = 'block';
@@ -804,7 +779,7 @@
             }
 
             const resultDiv = document.getElementById('regResult');
-            resultDiv.innerHTML = '<p> Saving school...</p>';
+            resultDiv.innerHTML = '<p>⏳ Saving school...</p>';
 
             try {
                 const response = await fetch(REGISTER_SCHOOL_GPS_URL, {
@@ -822,7 +797,7 @@
                 }
             } catch (error) {
                 resultDiv.className = 'result error';
-                resultDiv.innerHTML = `<strong> Error:</strong> ${error.message}`;
+                resultDiv.innerHTML = `<strong>🔌 Error:</strong> ${error.message}`;
             }
         }
 
@@ -839,7 +814,7 @@
             }
             
             navigator.geolocation.getCurrentPosition(async (pos) => {
-                div.innerHTML = '<p> Verifying location...</p>';
+                div.innerHTML = '<p>⏳ Verifying location...</p>';
                 const res = await fetch(VERIFY_ATTENDANCE_URL, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -874,7 +849,6 @@
             const canvas = document.getElementById('canvas');
             const photoBtn = document.getElementById('photoBtn');
             
-            // Check if time is between 10:30 AM and 12:00 PM (noon)
             const now = new Date();
             const hour = now.getHours();
             const minute = now.getMinutes();
@@ -890,7 +864,6 @@
             }
 
             try {
-                // Access camera
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 video.style.display = 'block';
                 video.srcObject = stream;
@@ -898,21 +871,15 @@
                 photoBtn.textContent = 'Taking photo in 3 seconds...';
                 photoBtn.disabled = true;
 
-                // Wait 3 seconds then capture
                 setTimeout(async () => {
                     const context = canvas.getContext('2d');
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
                     context.drawImage(video, 0, 0);
-                    
-                    // Convert to base64
                     const photoData = canvas.toDataURL('image/jpeg');
-                    
-                    // Stop camera
                     stream.getTracks().forEach(track => track.stop());
                     video.style.display = 'none';
                     
-                    // Upload to server
                     resultDiv.innerHTML = '<p>Uploading photo...</p>';
                     resultDiv.style.display = 'block';
                     resultDiv.className = 'result loading';
@@ -929,7 +896,6 @@
                     });
 
                     const result = await response.json();
-                    
                     if (response.ok) {
                         resultDiv.className = 'result success';
                         resultDiv.innerHTML = `<strong>✅ Photo Captured!</strong><br>Your attendance at ${hour}:${minute.toString().padStart(2, '0')} has been verified.`;
@@ -937,7 +903,6 @@
                         resultDiv.className = 'result error';
                         resultDiv.innerHTML = `<strong>❌ Error:</strong> ${result.error}`;
                     }
-                    
                     photoBtn.textContent = '📷 Capture Attendance Photo (10:30 AM - 12:00 PM)';
                     photoBtn.disabled = false;
                 }, 3000);
@@ -945,7 +910,7 @@
             } catch (error) {
                 resultDiv.style.display = 'block';
                 resultDiv.className = 'result error';
-                resultDiv.innerHTML = `<strong> Camera Error:</strong> ${error.message}. Please allow camera access.`;
+                resultDiv.innerHTML = `<strong>❌ Camera Error:</strong> ${error.message}. Please allow camera access.`;
             }
         }
     </script>
