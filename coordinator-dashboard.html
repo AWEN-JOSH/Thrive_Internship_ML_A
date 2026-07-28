@@ -3,114 +3,293 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coordinator Dashboard</title>
+    <title>Coordinator Dashboard - AWEN-STS</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f7f6; }
         .header { background: #232f3e; color: white; padding: 20px; text-align: center; }
-        .container { max-width: 1200px; margin: 20px auto; padding: 20px; }
-        .stats { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
-        .stat-card { background: white; padding: 20px; border-radius: 8px; flex: 1; min-width: 200px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .stat-number { font-size: 32px; font-weight: bold; color: #ff9900; }
-        table { width: 100%; background: white; border-collapse: collapse; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .container { max-width: 1400px; margin: 20px auto; padding: 20px; }
+        .toolbar { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 25px; border-radius: 8px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .stat-number { font-size: 36px; font-weight: bold; color: #ff9900; }
+        .stat-label { color: #666; margin-top: 5px; font-size: 14px; }
+        .btn { padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600; margin: 5px; }
+        .btn-primary { background: #ff9900; color: white; }
+        .btn-secondary { background: #232f3e; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .table-container { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .table-header { background: #232f3e; color: white; padding: 15px 20px; font-size: 18px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+        table { width: 100%; border-collapse: collapse; }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background: #232f3e; color: white; }
-        .btn { background: #ff9900; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-right: 10px; }
-        .logout { background: #dc3545; float: right; }
+        th { background: #f8f9fa; font-weight: 600; color: #232f3e; }
+        tr:hover { background: #f8f9fa; }
+        .loading { text-align: center; padding: 40px; color: #666; }
+        .download-section { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .download-section h3 { margin-top: 0; color: #232f3e; }
+        .verified { color: #28a745; font-weight: bold; }
+        .unverified { color: #dc3545; font-weight: bold; }
+        @media print { .no-print { display: none; } }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>👨‍ Coordinator Dashboard</h1>
+        <h1>👨‍🏫 Coordinator Dashboard</h1>
         <p id="schoolName">Loading school...</p>
     </div>
     
     <div class="container">
-        <div style="margin-bottom: 20px;">
-            <button class="btn" onclick="loadDashboard()">🔄 Refresh Data</button>
-            <button class="btn logout" onclick="logout()">🚪 Logout</button>
+        <!-- Download Section -->
+        <div class="download-section no-print">
+            <h3>📥 Download Reports & Data</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px;">
+                <button class="btn btn-success" onclick="downloadAttendanceCSV()">📊 Download Attendance (CSV)</button>
+                <button class="btn btn-primary" onclick="downloadStudentList()">📋 Download Student List (CSV)</button>
+                <button class="btn btn-secondary" onclick="downloadWeeklyReport()">📈 Download Weekly Report</button>
+                <button class="btn btn-primary" onclick="window.print()">🖨️ Print Dashboard</button>
+            </div>
+        </div>
+
+        <div class="toolbar no-print">
+            <button class="btn btn-primary" onclick="loadDashboard()">🔄 Refresh Data</button>
+            <button class="btn btn-danger" onclick="logout()">🚪 Logout</button>
         </div>
 
         <div class="stats">
-            <div class="stat-card"><div class="stat-number" id="totalStudents">0</div><div>Total Students</div></div>
-            <div class="stat-card"><div class="stat-number" id="checkedIn">0</div><div>Checked In</div></div>
-            <div class="stat-card"><div class="stat-number" id="verifiedCount" style="color: green;">0</div><div>Verified Present</div></div>
-            <div class="stat-card"><div class="stat-number" id="photoCount" style="color: blue;">0</div><div>Photos Taken</div></div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalStudents">0</div>
+                <div class="stat-label">Total Students</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="checkedIn" style="color: #2196F3;">0</div>
+                <div class="stat-label">Checked In</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="verifiedCount" style="color: #28a745;">0</div>
+                <div class="stat-label">✅ Verified Present</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="photoCount" style="color: #17a2b8;">0</div>
+                <div class="stat-label">📸 Photos Captured</div>
+            </div>
         </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Student Name</th>
-                    <th>Visit Day</th>
-                    <th>Check-In</th>
-                    <th>Check-Out</th>
-                    <th>Distance</th>
-                    <th>Status</th>
-                    <th>Photo</th>
-                </tr>
-            </thead>
-            <tbody id="attendanceTable">
-                <tr><td colspan="7" style="text-align:center;">Loading data...</td></tr>
-            </tbody>
-        </table>
+        <div class="table-container">
+            <div class="table-header">
+                <span> Today's Attendance Details</span>
+                <span id="currentDate"></span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Visit Day</th>
+                        <th>Check-In Time</th>
+                        <th>Check-Out Time</th>
+                        <th>Distance from School</th>
+                        <th>GPS Status</th>
+                        <th>11 AM Photo</th>
+                    </tr>
+                </thead>
+                <tbody id="attendanceTable">
+                    <tr><td colspan="7" class="loading">Loading attendance data...</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
-        // YOUR DASHBOARD LAMBDA URL
         const DASHBOARD_URL = 'https://rb2wxcvtgxemegalw7vxqqw5qm0ggzbf.lambda-url.us-east-1.on.aws/';
+        let currentData = null; // Store data for downloads
 
+        // Check if coordinator is logged in
         const coordData = JSON.parse(localStorage.getItem('coordinator') || '{}');
-        
         if (!coordData.coordinator_id) {
             window.location.href = 'coordinator-login.html';
-        } else {
-            document.getElementById('schoolName').textContent = `School: ${coordData.school_id}`;
         }
 
+        document.getElementById('schoolName').textContent = `School: ${coordData.school_id}`;
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString();
+
         async function loadDashboard() {
+            const tbody = document.getElementById('attendanceTable');
+            tbody.innerHTML = '<tr><td colspan="7" class="loading">Loading attendance data...</td></tr>';
+
             try {
                 const response = await fetch(DASHBOARD_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ school_id: coordData.school_id })
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        coordinator_id: coordData.coordinator_id,
+                        school_id: coordData.school_id
+                    })
                 });
+
                 const data = await response.json();
+                currentData = data; // Store for downloads
                 
+                // Update stats
                 document.getElementById('totalStudents').textContent = data.total_students || 0;
                 document.getElementById('checkedIn').textContent = data.checked_in || 0;
                 document.getElementById('verifiedCount').textContent = data.verified_present || 0;
                 document.getElementById('photoCount').textContent = data.photos_captured || 0;
 
-                const tbody = document.getElementById('attendanceTable');
+                // Update table
                 tbody.innerHTML = '';
 
                 if (data.students && data.students.length > 0) {
-                    data.students.forEach(s => {
+                    data.students.forEach(student => {
                         const row = tbody.insertRow();
+                        
+                        const checkInTime = student.check_in ? new Date(student.check_in).toLocaleTimeString() : '<span style="color: #999;">N/A</span>';
+                        const checkOutTime = student.check_out ? new Date(student.check_out).toLocaleTimeString() : '<span style="color: #999;">N/A</span>';
+                        const distance = student.distance_meters ? Math.round(student.distance_meters) + 'm' : 'N/A';
+                        
+                        const statusClass = student.verified ? 'verified' : 'unverified';
+                        const statusText = student.verified ? '✅ Verified' : '❌ Not Verified';
+                        
+                        const photoStatus = student.photo_captured ? '📸 Captured' : '<span style="color: #999;"> Not Taken</span>';
+                        
                         row.innerHTML = `
-                            <td>${s.student_name || s.student_id}</td>
-                            <td>${s.visit_day || 'N/A'}</td>
-                            <td>${s.check_in ? new Date(s.check_in).toLocaleTimeString() : '-'}</td>
-                            <td>${s.check_out ? new Date(s.check_out).toLocaleTimeString() : '-'}</td>
-                            <td>${s.distance_meters ? Math.round(s.distance_meters) + 'm' : '-'}</td>
-                            <td style="color: ${s.verified ? 'green' : 'red'}">${s.verified ? '✅ Verified' : '❌ Unverified'}</td>
-                            <td>${s.photo_captured ? '📸 Yes' : 'No'}</td>
+                            <td><strong>${student.student_name || student.student_id}</strong></td>
+                            <td>${student.visit_day || 'N/A'}</td>
+                            <td>${checkInTime}</td>
+                            <td>${checkOutTime}</td>
+                            <td>${distance}</td>
+                            <td class="${statusClass}">${statusText}</td>
+                            <td>${photoStatus}</td>
                         `;
                     });
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No attendance records found for today.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #999;">No students found for this school today</td></tr>';
                 }
             } catch (error) {
-                console.error('Error loading dashboard:', error);
+                console.error('Error:', error);
+                tbody.innerHTML = '<tr><td colspan="7" style="color: #dc3545; text-align: center;">Error loading data: ' + error.message + '</td></tr>';
             }
         }
 
-        function logout() {
-            localStorage.removeItem('coordinator');
-            window.location.href = 'coordinator-login.html';
+        // Download Attendance as CSV
+        function downloadAttendanceCSV() {
+            if (!currentData || !currentData.students) {
+                alert('No data available to download. Please refresh the dashboard first.');
+                return;
+            }
+
+            let csv = 'Student Name,Visit Day,Check-In Time,Check-Out Time,Distance (meters),GPS Status,Photo Captured\n';
+            
+            currentData.students.forEach(s => {
+                const checkIn = s.check_in ? new Date(s.check_in).toLocaleTimeString() : 'N/A';
+                const checkOut = s.check_out ? new Date(s.check_out).toLocaleTimeString() : 'N/A';
+                const distance = s.distance_meters || 'N/A';
+                const status = s.verified ? 'Verified' : 'Not Verified';
+                const photo = s.photo_captured ? 'Yes' : 'No';
+                
+                csv += `"${s.student_name || s.student_id}",${s.visit_day || 'N/A'},${checkIn},${checkOut},${distance},${status},${photo}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Attendance_Report_${coordData.school_id}_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            alert('Attendance report downloaded successfully!');
         }
 
+        // Download Student List
+        function downloadStudentList() {
+            if (!currentData || !currentData.students) {
+                alert('No student data available.');
+                return;
+            }
+
+            let csv = 'Student Name,Student ID,Visit Day,School\n';
+            
+            currentData.students.forEach(s => {
+                csv += `"${s.student_name || s.student_id}",${s.student_id},"${s.visit_day || 'N/A'}","${coordData.school_id}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Student_List_${coordData.school_id}_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            alert('Student list downloaded successfully!');
+        }
+
+        // Download Weekly Report
+        function downloadWeeklyReport() {
+            if (!currentData) {
+                alert('No data available for weekly report.');
+                return;
+            }
+
+            const report = `
+COORDINATOR WEEKLY REPORT
+=========================
+School: ${coordData.school_id}
+Coordinator: ${coordData.coordinator_id}
+Report Date: ${new Date().toLocaleDateString()}
+Report Time: ${new Date().toLocaleTimeString()}
+
+SUMMARY STATISTICS
+==================
+Total Students: ${currentData.total_students || 0}
+Checked In Today: ${currentData.checked_in || 0}
+Verified Present: ${currentData.verified_present || 0}
+Photos Captured: ${currentData.photos_captured || 0}
+
+ATTENDANCE DETAILS
+==================
+${currentData.students ? currentData.students.map(s => `
+Student: ${s.student_name || s.student_id}
+Visit Day: ${s.visit_day || 'N/A'}
+Check-In: ${s.check_in ? new Date(s.check_in).toLocaleString() : 'N/A'}
+Check-Out: ${s.check_out ? new Date(s.check_out).toLocaleString() : 'N/A'}
+Distance: ${s.distance_meters ? Math.round(s.distance_meters) + 'm' : 'N/A'}
+Status: ${s.verified ? 'Verified' : 'Not Verified'}
+Photo: ${s.photo_captured ? 'Captured' : 'Not Captured'}
+---`).join('') : 'No attendance records'}
+
+Generated by AWEN-STS Report Generator System
+            `;
+
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Weekly_Report_${coordData.school_id}_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            alert('Weekly report downloaded successfully!');
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('coordinator');
+                window.location.href = 'coordinator-login.html';
+            }
+        }
+
+        // Initial load
         loadDashboard();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(loadDashboard, 30000);
     </script>
 </body>
 </html>
