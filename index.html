@@ -78,7 +78,7 @@
             <h2>👑 Administrator Dashboard (Kwame Mensah Only)</h2>
             
             <!-- Part 1: QR Code Generator -->
-            <h3>📱 Generate Student QR Code</h3>
+            <h3> Generate Student QR Code</h3>
             <div class="form-row">
                 <div class="form-col">
                     <input type="text" id="qrStudentId" placeholder="Enter Student ID to generate QR">
@@ -186,7 +186,7 @@
             <hr style="margin: 30px 0; border: 0; border-top: 1px solid #ccc;">
 
             <!-- Part 4: Register New Coordinator -->
-            <h3>👨‍🏫 Register New Coordinator</h3>
+            <h3>‍🏫 Register New Coordinator</h3>
             <p>Create coordinator account (valid for 1 year)</p>
             <div class="form-row">
                 <div class="form-col">
@@ -258,7 +258,7 @@
             <h2>Daily SRJ Log & GPS Attendance</h2>
             
             <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #2196F3;">
-                <h3 style="margin-top: 0; color: #1976D2;">📍 Daily Attendance Verification</h3>
+                <h3 style="margin-top: 0; color: #1976D2;"> Daily Attendance Verification</h3>
                 <p>Click Check-In when you arrive at school (8 AM) and Check-Out when you leave (1 PM). GPS location will be verified.</p>
                 <div class="form-row">
                     <button onclick="verifyAttendance('check_in')" style="background:#28a745; flex:1; font-size: 16px; padding: 15px;">✅ CHECK IN (8 AM)</button>
@@ -323,22 +323,25 @@
     </div>
 
     <script>
-        // --- LAMBDA URLs ---
-        const CHECK_STATUS_URL = 'https://3erbngd2ne5pcg2vcjrzb2hrjq0bnjhn.lambda-url.us-east-1.on.aws/';
-        const GENERATE_SRJ_URL = 'https://fwe3c5khbsp6tdsurvvfsefme40aevnx.lambda-url.us-east-1.on.aws/';
-        const SAVE_LOG_URL = 'https://3n6sennmgib2fc24fz3ynbm5u40zekrs.lambda-url.us-east-1.on.aws/';
-        const SAVE_SCHOOL_URL = 'https://4clxwpc6j7hnty44gxusrqvwnu0mqiwl.lambda-url.us-east-1.on.aws/';
-        const GENERATE_REPORT_URL = 'https://c746jcx5oxzbwwdct2xmsfy5540cfafy.lambda-url.us-east-1.on.aws/';
-        const ENROLLMENT_LAMBDA_URL = 'https://26xhf3qx3z3r4boqpjpbsv3nsm0tfojd.lambda-url.us-east-1.on.aws/';
+        // --- API GATEWAY URL ---
+        const API_BASE_URL = 'https://h1ilc8m1mc.execute-api.us-east-1.amazonaws.com';
         
-        const REGISTER_SCHOOL_GPS_URL = 'https://og76mgg7ocnuzlemfeos46xrl40amnwm.lambda-url.us-east-1.on.aws/';
-        const VERIFY_ATTENDANCE_URL = 'https://eaifacskg2gwtb6m4b6dxleet40caflp.lambda-url.us-east-1.on.aws/';
-        const GET_ATTENDANCE_DASHBOARD_URL = 'https://jqlkrpwgldev5fcbyh5llrkuzu0wrnbb.lambda-url.us-east-1.on.aws/';
+        // API Endpoints (adjust paths based on your API Gateway configuration)
+        const CHECK_STATUS_URL = `${API_BASE_URL}/check-status`;
+        const GENERATE_SRJ_URL = `${API_BASE_URL}/generate-srj`;
+        const SAVE_LOG_URL = `${API_BASE_URL}/save-log`;
+        const SAVE_SCHOOL_URL = `${API_BASE_URL}/save-school`;
+        const GENERATE_REPORT_URL = `${API_BASE_URL}/generate-report`;
+        const ENROLLMENT_LAMBDA_URL = `${API_BASE_URL}/enroll-student`;
         
-        const REGISTER_COORDINATOR_URL = 'https://7su73m5h6ivzc7ktlluzjxsyku0fepzv.lambda-url.us-east-1.on.aws/';
-        const COORDINATOR_LOGIN_URL = 'https://gzduysxv7ddbaklpe7b3wdwl7i0jgshn.lambda-url.us-east-1.on.aws/';
-        const CAPTURE_ATTENDANCE_PHOTO_URL = 'https://6dfe6z75yohubbexchkohxs3ca0cerpc.lambda-url.us-east-1.on.aws/';
-        const GET_COORDINATOR_DASHBOARD_URL = 'https://rb2wxcvtgxemegalw7vxqqw5qm0ggzbf.lambda-url.us-east-1.on.aws/';
+        const REGISTER_SCHOOL_GPS_URL = `${API_BASE_URL}/register-school-gps`;
+        const VERIFY_ATTENDANCE_URL = `${API_BASE_URL}/verify-attendance`;
+        const GET_ATTENDANCE_DASHBOARD_URL = `${API_BASE_URL}/get-attendance-dashboard`;
+        
+        const REGISTER_COORDINATOR_URL = `${API_BASE_URL}/register-coordinator`;
+        const COORDINATOR_LOGIN_URL = `${API_BASE_URL}/coordinator-login`;
+        const CAPTURE_ATTENDANCE_PHOTO_URL = `${API_BASE_URL}/capture-attendance-photo`;
+        const GET_COORDINATOR_DASHBOARD_URL = `${API_BASE_URL}/get-coordinator-dashboard`;
 
         const ADMIN_ID = 'Kwame Mensah';
         let currentStudentId = null;
@@ -433,7 +436,7 @@
             const statusDiv = document.getElementById('schoolSaveStatus');
             statusDiv.style.display = 'block';
             statusDiv.className = 'result loading';
-            statusDiv.innerHTML = '<p>⏳ Saving comprehensive profile...</p>';
+            statusDiv.innerHTML = '<p> Saving comprehensive profile...</p>';
 
             const teaching_staff = {
                 male_professional: document.getElementById('ts_male_prof').value,
@@ -613,7 +616,7 @@
                 }
             } catch (error) {
                 statusDiv.className = 'result error';
-                statusDiv.innerHTML = `<h3>🔌 Connection Error</h3><p>${error.message}</p>`;
+                statusDiv.innerHTML = `<h3> Connection Error</h3><p>${error.message}</p>`;
             }
         }
 
@@ -693,7 +696,7 @@
             resultDiv.innerHTML = '<p>Registering coordinator...</p>';
 
             try {
-                console.log('Sending request to Lambda...');
+                console.log('Sending request to API Gateway...');
                 console.log('Data:', data);
                 
                 const response = await fetch(REGISTER_COORDINATOR_URL, {
@@ -733,7 +736,7 @@
             } catch (error) {
                 console.error('Registration error:', error);
                 resultDiv.className = 'result error';
-                resultDiv.innerHTML = `<strong>❌ Connection Error:</strong> ${error.message}<br><small>Check browser console (F12) for details. Make sure Lambda URL is correct and CORS is enabled.</small>`;
+                resultDiv.innerHTML = `<strong>❌ Connection Error:</strong> ${error.message}<br><small>Check browser console (F12) for details. Make sure API Gateway URL is correct and CORS is enabled.</small>`;
             }
         }
 
@@ -910,7 +913,7 @@
             } catch (error) {
                 resultDiv.style.display = 'block';
                 resultDiv.className = 'result error';
-                resultDiv.innerHTML = `<strong>❌ Camera Error:</strong> ${error.message}. Please allow camera access.`;
+                resultDiv.innerHTML = `<strong> Camera Error:</strong> ${error.message}. Please allow camera access.`;
             }
         }
     </script>
