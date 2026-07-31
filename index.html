@@ -58,14 +58,14 @@
                 </div>
                 <div class="form-col">
                     <select id="semesterSelect">
-                        <option value="1">Sem 1: Child Study & Observation</option>
-                        <option value="2">Sem 2: Micro-Teaching & Embedded Practice</option>
-                        <option value="3">Sem 3: Teaching Practice I (Core Subjects)</option>
-                        <option value="4">Sem 4: Teaching Practice II (Electives)</option>
-                        <option value="5">Sem 5: Inclusive Education & Special Needs</option>
-                        <option value="6">Sem 6: Action Research & School Admin</option>
-                        <option value="7">Sem 7: Professional Internship & Portfolio</option>
-                        <option value="8">Sem 8: Capstone & Career Transition</option>
+                        <option value="1">Year One, Semester 1: STS: Beginning Teaching 1</option>
+                        <option value="2">Year One, Semester 2: STS: Beginning Teaching 2</option>
+                        <option value="3">Year Two, Semester 1: STS: Developing Teaching 1</option>
+                        <option value="4">Year Two, Semester 2: STS: Developing Teaching 2</option>
+                        <option value="5">Year Three, Semester 1: STS: Embedding Teaching 1</option>
+                        <option value="6">Year Three, Semester 2: STS: Embedding Teaching 2</option>
+                        <option value="7">Year Four, Semester 1: STS: Extending Teaching (Internship)</option>
+                        <option value="8">Year Four, Semester 2: STS: Extending Teaching II</option>
                     </select>
                 </div>
             </div>
@@ -115,14 +115,14 @@
                 <div class="form-col">
                     <label>Current Semester</label>
                     <select id="enrollSemester">
-                        <option value="1">Sem 1: Child Study</option>
-                        <option value="2">Sem 2: Micro-Teaching</option>
-                        <option value="3">Sem 3: Core Subjects</option>
-                        <option value="4">Sem 4: Electives</option>
-                        <option value="5">Sem 5: Inclusive Ed</option>
-                        <option value="6">Sem 6: Action Research</option>
-                        <option value="7">Sem 7: Internship</option>
-                        <option value="8">Sem 8: Capstone</option>
+                        <option value="1">Year One, Semester 1: STS: Beginning Teaching 1</option>
+                        <option value="2">Year One, Semester 2: STS: Beginning Teaching 2</option>
+                        <option value="3">Year Two, Semester 1: STS: Developing Teaching 1</option>
+                        <option value="4">Year Two, Semester 2: STS: Developing Teaching 2</option>
+                        <option value="5">Year Three, Semester 1: STS: Embedding Teaching 1</option>
+                        <option value="6">Year Three, Semester 2: STS: Embedding Teaching 2</option>
+                        <option value="7">Year Four, Semester 1: STS: Extending Teaching (Internship)</option>
+                        <option value="8">Year Four, Semester 2: STS: Extending Teaching II</option>
                     </select>
                 </div>
             </div>
@@ -179,14 +179,14 @@
                     <input type="number" step="any" id="regLong" placeholder="Auto-filled">
                 </div>
             </div>
-            <button onclick="captureGPS()" style="background:#17a2b8; width:100%;">📡 Capture My Current GPS (Do this at the school)</button>
+            <button onclick="captureGPS()" style="background:#17a2b8; width:100%;"> Capture My Current GPS (Do this at the school)</button>
             <button onclick="saveSchoolGPS()" style="background:#232f3e; width:100%; margin-top:10px;">💾 Save School to Registry</button>
             <div id="regResult" class="result" style="margin-top:15px;"></div>
 
             <hr style="margin: 30px 0; border: 0; border-top: 1px solid #ccc;">
 
             <!-- Part 4: Register New Coordinator -->
-            <h3>👨‍🏫 Register New Coordinator</h3>
+            <h3>👨‍ Register New Coordinator</h3>
             <p>Create coordinator account (valid for 1 year)</p>
             <div class="form-row">
                 <div class="form-col">
@@ -258,7 +258,7 @@
             <h2>Daily SRJ Log & GPS Attendance</h2>
             
             <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #2196F3;">
-                <h3 style="margin-top: 0; color: #1976D2;">📍 Daily Attendance Verification</h3>
+                <h3 style="margin-top: 0; color: #1976D2;"> Daily Attendance Verification</h3>
                 <p>Click Check-In when you arrive at school (8 AM) and Check-Out when you leave (1 PM). GPS location will be verified.</p>
                 <div class="form-row">
                     <button onclick="verifyAttendance('check_in')" style="background:#28a745; flex:1; font-size: 16px; padding: 15px;">✅ CHECK IN (8 AM)</button>
@@ -670,7 +670,7 @@
                     document.getElementById('enrollSchool').value = '';
                 } else {
                     resultDiv.className = 'result error';
-                    resultDiv.innerHTML = `<strong>❌ Error:</strong> ${result.error}`;
+                    resultDiv.innerHTML = `<strong> Error:</strong> ${result.error}`;
                 }
             } catch (error) {
                 resultDiv.className = 'result error';
