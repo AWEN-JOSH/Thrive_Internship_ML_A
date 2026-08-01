@@ -107,11 +107,20 @@
                     <input type="text" id="enrollName" placeholder="e.g. Ama Baba">
                 </div>
             </div>
+            
+            <!-- NEW: College/University Field Added Here -->
             <div class="form-row">
                 <div class="form-col">
-                    <label>Practice School</label>
-                    <input type="text" id="enrollSchool" placeholder="e.g. St. Mary's JHS">
+                    <label>College/University Attending *</label>
+                    <input type="text" id="enrollCollege" placeholder="e.g. University of Cape Coast" required>
                 </div>
+                <div class="form-col">
+                    <label>Practice School (STS Placement) *</label>
+                    <input type="text" id="enrollSchool" placeholder="e.g. St. Mary's JHS" required>
+                </div>
+            </div>
+
+            <div class="form-row">
                 <div class="form-col">
                     <label>Current Semester</label>
                     <select id="enrollSemester">
@@ -125,8 +134,6 @@
                         <option value="8">Year Four, Semester 2: STS: Extending Teaching II</option>
                     </select>
                 </div>
-            </div>
-            <div class="form-row">
                 <div class="form-col">
                     <label>Year Level</label>
                     <select id="enrollYear">
@@ -136,6 +143,8 @@
                         <option value="Year 4">Year 4</option>
                     </select>
                 </div>
+            </div>
+            <div class="form-row">
                 <div class="form-col">
                     <label>Weekly Visit Day</label>
                     <select id="enrollVisitDay">
@@ -638,6 +647,7 @@
                 admin_id: ADMIN_ID,
                 student_id: document.getElementById('enrollId').value,
                 student_name: document.getElementById('enrollName').value,
+                college: document.getElementById('enrollCollege').value,       // <-- NEW: College field
                 school_id: document.getElementById('enrollSchool').value,
                 semester: document.getElementById('enrollSemester').value,
                 year: document.getElementById('enrollYear').value,
@@ -645,8 +655,9 @@
                 expiry_date: document.getElementById('enrollExpiry').value
             };
 
-            if (!studentData.student_id || !studentData.student_name) {
-                alert('Please enter Student ID and Name!');
+            // Updated validation to require College and Practice School
+            if (!studentData.student_id || !studentData.student_name || !studentData.college || !studentData.school_id) {
+                alert('Please fill in Student ID, Name, College, and Practice School!');
                 return;
             }
 
@@ -665,12 +676,14 @@
                 if (response.ok) {
                     resultDiv.className = 'result success';
                     resultDiv.innerHTML = `<strong>✅ Success!</strong> ${result.message}`;
+                    // Clear form fields
                     document.getElementById('enrollId').value = '';
                     document.getElementById('enrollName').value = '';
+                    document.getElementById('enrollCollege').value = '';       // <-- NEW: Clear college field
                     document.getElementById('enrollSchool').value = '';
                 } else {
                     resultDiv.className = 'result error';
-                    resultDiv.innerHTML = `<strong> Error:</strong> ${result.error}`;
+                    resultDiv.innerHTML = `<strong>❌ Error:</strong> ${result.error}`;
                 }
             } catch (error) {
                 resultDiv.className = 'result error';
