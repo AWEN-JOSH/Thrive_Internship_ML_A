@@ -3,26 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coordinator Login - AWEN-STS</title>
+    <title>College Coordinator Login - AWEN-STS</title>
     <style>
         body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
         .login-container { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 100%; max-width: 400px; }
-        h1 { text-align: center; color: #232f3e; margin-top: 0; }
+        h1 { text-align: center; color: #232f3e; margin-top: 0; font-size: 24px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 20px; font-size: 14px; }
         input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 16px; }
-        button { width: 100%; padding: 15px; background: #ff9900; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold; }
+        button { width: 100%; padding: 15px; background: #ff9900; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold; transition: background 0.3s; }
         button:hover { background: #e68a00; }
-        .error { color: red; text-align: center; margin-top: 15px; display: none; background: #fdecea; padding: 10px; border-radius: 5px; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .error { color: #c62828; text-align: center; margin-top: 15px; display: none; background: #fdecea; padding: 10px; border-radius: 5px; border-left: 4px solid #f44336; }
         .back-link { text-align: center; margin-top: 20px; }
-        .back-link a { color: #667eea; text-decoration: none; }
+        .back-link a { color: #667eea; text-decoration: none; font-size: 14px; }
+        .back-link a:hover { text-decoration: underline; }
+        .admin-note { text-align: center; font-size: 12px; color: #888; margin-top: 15px; }
     </style>
 </head>
 <body>
     <div class="login-container">
-        <h1>👨‍🏫 Coordinator Login</h1>
-        <input type="text" id="coordinatorId" placeholder="Coordinator ID">
+        <h1>👨‍🏫 College Coordinator Login</h1>
+        <p class="subtitle">Monitor your college's STS students</p>
+        
+        <input type="text" id="coordinatorId" placeholder="Coordinator ID (e.g., coord_ucc)">
         <input type="password" id="password" placeholder="Password">
-        <button onclick="coordinatorLogin()">Login to Dashboard</button>
+        
+        <button onclick="coordinatorLogin()" id="loginBtn">Login to Dashboard</button>
+        
         <div id="errorMsg" class="error"></div>
+        
+        <div class="admin-note">
+            Don't have an account? Contact Administrator (Kwame Mensah) for registration.
+        </div>
+        
         <div class="back-link">
             <a href="index.html">← Back to Student Login</a>
         </div>
@@ -36,37 +49,64 @@
             const coordId = document.getElementById('coordinatorId').value.trim();
             const password = document.getElementById('password').value;
             const errorMsg = document.getElementById('errorMsg');
+            const loginBtn = document.getElementById('loginBtn');
 
             errorMsg.style.display = 'none';
 
             if (!coordId || !password) {
-                errorMsg.textContent = 'Please enter both ID and Password';
+                errorMsg.textContent = 'Please enter both Coordinator ID and Password';
                 errorMsg.style.display = 'block';
                 return;
             }
+
+            // Show loading state to prevent double-clicks
+            loginBtn.textContent = 'Logging in...';
+            loginBtn.disabled = true;
 
             try {
                 const response = await fetch(COORDINATOR_LOGIN_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ coordinator_id: coordId, password: password })
+                    body: JSON.stringify({ 
+                        coordinator_id: coordId, 
+                        password: password 
+                    })
                 });
 
                 const data = await response.json();
 
                 if (response.ok) {
-                    localStorage.setItem('coordinator', JSON.stringify(data));
-                    window.location.href = 'coordinator-dashboard.html';
+                    // Check if account is expired (based on the expiry_date we added)
+                    if (data.status === 'expired') {
+                        errorMsg.textContent = '❌ Your account has expired. Please contact the Administrator.';
+                        errorMsg.style.display = 'block';
+                    } else {
+                        // Save coordinator data (including the new 'college' field) to localStorage
+                        // The dashboard will read 'college' from this saved data
+                        localStorage.setItem('coordinator', JSON.stringify(data));
+                        window.location.href = 'coordinator-dashboard.html';
+                    }
                 } else {
-                    errorMsg.textContent = '❌ ' + (data.error || 'Login failed');
+                    errorMsg.textContent = '❌ ' + (data.error || 'Login failed. Check your credentials.');
                     errorMsg.style.display = 'block';
                 }
             } catch (error) {
-                errorMsg.textContent = 'Connection error. Check console.';
+                errorMsg.textContent = 'Connection error. Please check your internet connection.';
                 errorMsg.style.display = 'block';
-                console.error(error);
+                console.error('Login error:', error);
+            } finally {
+                // Reset button state
+                loginBtn.textContent = 'Login to Dashboard';
+                loginBtn.disabled = false;
             }
         }
+
+        // Allow pressing "Enter" key in the password field to trigger login
+        document.getElementById('password').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                coordinatorLogin();
+            }
+        });
     </script>
 </body>
 </html>
