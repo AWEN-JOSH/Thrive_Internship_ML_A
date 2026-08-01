@@ -108,7 +108,7 @@
                 </div>
             </div>
             
-            <!-- NEW: College/University Field Added Here -->
+            <!-- College/University Field -->
             <div class="form-row">
                 <div class="form-col">
                     <label>College/University Attending *</label>
@@ -194,21 +194,23 @@
 
             <hr style="margin: 30px 0; border: 0; border-top: 1px solid #ccc;">
 
-            <!-- Part 4: Register New Coordinator -->
-            <h3>👨‍ Register New Coordinator</h3>
-            <p>Create coordinator account (valid for 1 year)</p>
+            <!-- Part 4: Register New Coordinator (UPDATED FOR COLLEGE) -->
+            <h3>👨‍🏫 Register New Coordinator</h3>
+            <p>Create coordinator account to monitor students from a specific college (valid for 1 year)</p>
             <div class="form-row">
                 <div class="form-col">
                     <label>Coordinator ID</label>
-                    <input type="text" id="coordId" placeholder="e.g., coord_stmarys">
+                    <input type="text" id="coordId" placeholder="e.g., coord_ucc">
                 </div>
                 <div class="form-col">
                     <label>Password</label>
                     <input type="password" id="coordPassword" placeholder="Password">
                 </div>
+            </div>
+            <div class="form-row">
                 <div class="form-col">
-                    <label>School ID</label>
-                    <input type="text" id="coordSchool" placeholder="e.g., St. Mary's JHS">
+                    <label>College/University *</label>
+                    <input type="text" id="coordCollege" placeholder="e.g., University of Cape Coast" required>
                 </div>
             </div>
             <button onclick="registerCoordinator()" style="background: #17a2b8; width:100%;">Register Coordinator</button>
@@ -647,7 +649,7 @@
                 admin_id: ADMIN_ID,
                 student_id: document.getElementById('enrollId').value,
                 student_name: document.getElementById('enrollName').value,
-                college: document.getElementById('enrollCollege').value,       // <-- NEW: College field
+                college: document.getElementById('enrollCollege').value,
                 school_id: document.getElementById('enrollSchool').value,
                 semester: document.getElementById('enrollSemester').value,
                 year: document.getElementById('enrollYear').value,
@@ -655,7 +657,6 @@
                 expiry_date: document.getElementById('enrollExpiry').value
             };
 
-            // Updated validation to require College and Practice School
             if (!studentData.student_id || !studentData.student_name || !studentData.college || !studentData.school_id) {
                 alert('Please fill in Student ID, Name, College, and Practice School!');
                 return;
@@ -676,10 +677,9 @@
                 if (response.ok) {
                     resultDiv.className = 'result success';
                     resultDiv.innerHTML = `<strong>✅ Success!</strong> ${result.message}`;
-                    // Clear form fields
                     document.getElementById('enrollId').value = '';
                     document.getElementById('enrollName').value = '';
-                    document.getElementById('enrollCollege').value = '';       // <-- NEW: Clear college field
+                    document.getElementById('enrollCollege').value = '';
                     document.getElementById('enrollSchool').value = '';
                 } else {
                     resultDiv.className = 'result error';
@@ -691,13 +691,19 @@
             }
         }
 
+        // UPDATED: Register Coordinator now uses 'college' instead of 'school_id'
         async function registerCoordinator() {
             const data = {
                 admin_id: ADMIN_ID,
                 coordinator_id: document.getElementById('coordId').value,
                 password: document.getElementById('coordPassword').value,
-                school_id: document.getElementById('coordSchool').value
+                college: document.getElementById('coordCollege').value // CHANGED to college
             };
+
+            if (!data.coordinator_id || !data.password || !data.college) {
+                alert('Please fill in Coordinator ID, Password, and College!');
+                return;
+            }
 
             const resultDiv = document.getElementById('coordResult');
             resultDiv.style.display = 'block';
@@ -705,26 +711,17 @@
             resultDiv.innerHTML = '<p>Registering coordinator...</p>';
 
             try {
-                console.log('Sending request to Lambda...');
-                console.log('Data:', data);
-                
                 const response = await fetch(REGISTER_COORDINATOR_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(data)
                 });
 
-                console.log('Response status:', response.status);
                 const responseText = await response.text();
-                console.log('Response text:', responseText);
-                
                 let result;
                 try {
                     result = JSON.parse(responseText);
                 } catch (e) {
-                    console.error('Failed to parse JSON:', e);
                     throw new Error('Invalid response from server');
                 }
                 
@@ -734,14 +731,13 @@
                     
                     document.getElementById('coordId').value = '';
                     document.getElementById('coordPassword').value = '';
-                    document.getElementById('coordSchool').value = '';
+                    document.getElementById('coordCollege').value = ''; // CHANGED to clear college field
                 } else {
                     resultDiv.className = 'result error';
                     resultDiv.innerHTML = `<strong>❌ Error:</strong> ${result.error || 'Unknown error'}`;
                 }
                 
             } catch (error) {
-                console.error('Registration error:', error);
                 resultDiv.className = 'result error';
                 resultDiv.innerHTML = `<strong>❌ Connection Error:</strong> ${error.message}<br><small>Check browser console (F12) for details.</small>`;
             }
