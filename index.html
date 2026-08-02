@@ -691,13 +691,12 @@
             }
         }
 
-        // UPDATED: Register Coordinator now uses 'college' instead of 'school_id'
         async function registerCoordinator() {
             const data = {
                 admin_id: ADMIN_ID,
                 coordinator_id: document.getElementById('coordId').value,
                 password: document.getElementById('coordPassword').value,
-                college: document.getElementById('coordCollege').value // CHANGED to college
+                college: document.getElementById('coordCollege').value
             };
 
             if (!data.coordinator_id || !data.password || !data.college) {
@@ -731,7 +730,7 @@
                     
                     document.getElementById('coordId').value = '';
                     document.getElementById('coordPassword').value = '';
-                    document.getElementById('coordCollege').value = ''; // CHANGED to clear college field
+                    document.getElementById('coordCollege').value = '';
                 } else {
                     resultDiv.className = 'result error';
                     resultDiv.innerHTML = `<strong>❌ Error:</strong> ${result.error || 'Unknown error'}`;
@@ -849,6 +848,9 @@
             }, {enableHighAccuracy: true});
         }
 
+        // ==========================================
+        // IMPROVED CAPTURE ATTENDANCE PHOTO FUNCTION
+        // ==========================================
         async function captureAttendancePhoto() {
             const resultDiv = document.getElementById('photoResult');
             const video = document.getElementById('camera');
@@ -862,6 +864,7 @@
             const startMinutes = 10 * 60 + 30;  // 10:30 AM
             const endMinutes = 12 * 60;          // 12:00 PM
             
+            // Time validation
             if (currentMinutes < startMinutes || currentMinutes > endMinutes) {
                 resultDiv.style.display = 'block';
                 resultDiv.className = 'result error';
@@ -869,54 +872,117 @@
                 return;
             }
 
+            // Show loading state
+            photoBtn.disabled = true;
+            photoBtn.textContent = '📷 Initializing camera...';
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result loading';
+            resultDiv.innerHTML = '<p>📷 Initializing camera...</p>';
+
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                // Request camera access with timeout
+                const stream = await Promise.race([
+                    navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            facingMode: 'user',
+                            width: { ideal: 640 },
+                            height: { ideal: 480 }
+                        } 
+                    }),
+                    new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('Camera access timeout')), 10000)
+                    )
+                ]);
+                
                 video.style.display = 'block';
                 video.srcObject = stream;
                 
+                // Wait for video to be ready
+                await new Promise((resolve) => {
+                    video.onloadedmetadata = () => {
+                        video.play();
+                        resolve();
+                    };
+                });
+                
                 photoBtn.textContent = 'Taking photo in 3 seconds...';
-                photoBtn.disabled = true;
+                resultDiv.innerHTML = '<p>📸 Position yourself and smile! Photo will be taken in 3 seconds...</p>';
 
-                setTimeout(async () => {
-                    const context = canvas.getContext('2d');
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    context.drawImage(video, 0, 0);
-                    const photoData = canvas.toDataURL('image/jpeg');
-                    stream.getTracks().forEach(track => track.stop());
-                    video.style.display = 'none';
-                    
-                    resultDiv.innerHTML = '<p>Uploading photo...</p>';
-                    resultDiv.style.display = 'block';
-                    resultDiv.className = 'result loading';
+                // Countdown
+                for (let i = 3; i > 0; i--) {
+                    resultDiv.innerHTML += `<p>${i}...</p>`;
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
 
-                    const response = await fetch(CAPTURE_ATTENDANCE_PHOTO_URL, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            student_id: currentStudentId,
-                            photo_data: photoData,
-                            week: parseInt(document.getElementById('weekNumber').value),
-                            day: parseInt(document.getElementById('dayNumber').value)
-                        })
-                    });
-
-                    const result = await response.json();
-                    if (response.ok) {
-                        resultDiv.className = 'result success';
-                        resultDiv.innerHTML = `<strong>✅ Photo Captured!</strong><br>Your attendance at ${hour}:${minute.toString().padStart(2, '0')} has been verified.`;
-                    } else {
-                        resultDiv.className = 'result error';
-                        resultDiv.innerHTML = `<strong>❌ Error:</strong> ${result.error}`;
-                    }
-                    photoBtn.textContent = ' Capture Attendance Photo (10:30 AM - 12:00 PM)';
-                    photoBtn.disabled = false;
-                }, 3000);
-
+                // Capture photo
+                const context = canvas.getContext('2d');
+                canvas.width = video.videoWidth || 640;
+                canvas.height = video.videoHeight || 480;
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const photoData = canvas.toDataURL('image/jpeg', 0.8); // Compress to 80%
+                
+                // Stop camera
+                stream.getTracks().forEach(track => track.stop());
+                video.style.display = 'none';
+                
+                // Upload photo with timeout
+                resultDiv.className = 'result loading';
+                resultDiv.innerHTML = '<p>⏳ Uploading photo... Please wait...</p>';
+                
+                const uploadPromise = fetch(CAPTURE_ATTENDANCE_PHOTO_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        student_id: currentStudentId,
+                        photo_data: photoData,
+                        week: parseInt(document.getElementById('weekNumber').value),
+                        day: parseInt(document.getElementById('dayNumber').value),
+                        timestamp: new Date().toISOString()
+                    })
+                });
+                
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Upload timeout - please try again')), 30000)
+                );
+                
+                const response = await Promise.race([uploadPromise, timeoutPromise]);
+                const result = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `<strong>✅ Photo Captured Successfully!</strong><br>
+                        <p>Your attendance at ${hour}:${minute.toString().padStart(2, '0')} has been verified.</p>
+                        <p style="margin-top:10px; font-size:12px;">Week ${document.getElementById('weekNumber').value}, Day ${document.getElementById('dayNumber').value}</p>`;
+                } else {
+                    throw new Error(result.error || 'Upload failed');
+                }
+                
             } catch (error) {
-                resultDiv.style.display = 'block';
+                console.error('Photo capture error:', error);
                 resultDiv.className = 'result error';
-                resultDiv.innerHTML = `<strong>❌ Camera Error:</strong> ${error.message}. Please allow camera access.`;
+                
+                let errorMessage = '❌ <strong>Camera Error:</strong> ';
+                if (error.name === 'NotAllowedError' || error.message.includes('permission')) {
+                    errorMessage += 'Camera access denied. Please allow camera permissions in your browser settings.';
+                } else if (error.name === 'NotFoundError' || error.message.includes('device')) {
+                    errorMessage += 'No camera found. Please connect a camera and try again.';
+                } else if (error.message.includes('timeout')) {
+                    errorMessage += error.message;
+                } else {
+                    errorMessage += error.message + '. Please try again.';
+                }
+                
+                resultDiv.innerHTML = errorMessage;
+            } finally {
+                // Reset button
+                photoBtn.textContent = '📷 Capture Attendance Photo (10:30 AM - 12:00 PM)';
+                photoBtn.disabled = false;
+                
+                // Ensure video is stopped
+                if (video.srcObject) {
+                    video.srcObject.getTracks().forEach(track => track.stop());
+                }
+                video.style.display = 'none';
             }
         }
     </script>
