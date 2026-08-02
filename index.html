@@ -806,6 +806,9 @@
             }
         }
 
+        // ==========================================
+        // IMPROVED VERIFY ATTENDANCE FUNCTION WITH ERROR HANDLING
+        // ==========================================
         async function verifyAttendance(action) {
             const div = document.getElementById('attendanceResult');
             div.style.display = 'block';
@@ -819,33 +822,51 @@
             }
             
             navigator.geolocation.getCurrentPosition(async (pos) => {
-                div.innerHTML = '<p> Verifying location...</p>';
-                const res = await fetch(VERIFY_ATTENDANCE_URL, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
+                try {
+                    div.innerHTML = '<p>🔄 Verifying location...</p>';
+                    
+                    const payload = {
                         student_id: currentStudentId,
                         action: action,
                         latitude: pos.coords.latitude,
                         longitude: pos.coords.longitude,
                         timestamp: new Date().toISOString()
-                    })
-                });
-                const data = await res.json();
-                if (res.ok && data.verified) {
-                    div.className = 'result success';
-                    div.innerHTML = `✅ <strong>VERIFIED!</strong> You are ${data.distance}m from your assigned school.<br>Time: ${new Date().toLocaleTimeString()}`;
-                } else if (res.ok && !data.verified) {
+                    };
+                    
+                    console.log('📤 Sending request:', payload);
+                    
+                    const res = await fetch(VERIFY_ATTENDANCE_URL, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    console.log('Response status:', res.status);
+                    const data = await res.json();
+                    console.log('📥 Response data:', data);
+                    
+                    if (res.ok) {
+                        if (data.verified) {
+                            div.className = 'result success';
+                            div.innerHTML = `✅ <strong>VERIFIED!</strong> You are ${data.distance}m from your assigned school.<br>Time: ${new Date().toLocaleTimeString()}`;
+                        } else {
+                            div.className = 'result error';
+                            div.innerHTML = `⚠️ <strong>LOCATION MISMATCH!</strong> You are ${data.distance}m away from your assigned school.`;
+                        }
+                    } else {
+                        div.className = 'result error';
+                        div.innerHTML = `❌ Error: ${data.error || 'Unknown error'}`;
+                    }
+                } catch (error) {
+                    console.error('❌ Fetch error:', error);
                     div.className = 'result error';
-                    div.innerHTML = `⚠️ <strong>LOCATION MISMATCH!</strong> You are ${data.distance}m away from your assigned school. Coordinator notified.`;
-                } else {
-                    div.className = 'result error';
-                    div.innerHTML = `❌ Error: ${data.error}`;
+                    div.innerHTML = `❌ Connection Error: ${error.message}. Check console (F12) for details.`;
                 }
             }, (err) => {
+                console.error('Geolocation error:', err);
                 div.className = 'result error';
-                div.innerHTML = '❌ Please enable Location Services on your phone!';
-            }, {enableHighAccuracy: true});
+                div.innerHTML = '❌ Please enable Location Services on your device!';
+            }, {enableHighAccuracy: true, timeout: 15000});
         }
 
         // ==========================================
