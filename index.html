@@ -270,10 +270,10 @@
             
             <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #2196F3;">
                 <h3 style="margin-top: 0; color: #1976D2;"> Daily Attendance Verification</h3>
-                <p>Click Check-In when you arrive at school (8 AM) and Check-Out when you leave (1 PM). GPS location will be verified.</p>
+                <p>Click Check-In when you arrive at school (7:30 AM - 8:10 AM) and Check-Out when you leave (1:00 PM - 2:00 PM). GPS location will be verified.</p>
                 <div class="form-row">
-                    <button onclick="verifyAttendance('check_in')" style="background:#28a745; flex:1; font-size: 16px; padding: 15px;">✅ CHECK IN (8 AM)</button>
-                    <button onclick="verifyAttendance('check_out')" style="background:#dc3545; flex:1; font-size: 16px; padding: 15px;"> CHECK OUT (1 PM)</button>
+                    <button onclick="verifyAttendance('check_in')" style="background:#28a745; flex:1; font-size: 16px; padding: 15px;">✅ CHECK IN (7:30 AM - 8:10 AM)</button>
+                    <button onclick="verifyAttendance('check_out')" style="background:#dc3545; flex:1; font-size: 16px; padding: 15px;"> CHECK OUT (1:00 PM - 2:00 PM)</button>
                 </div>
                 <div id="attendanceResult" class="result" style="margin-top:15px;"></div>
             </div>
@@ -807,13 +807,40 @@
         }
 
         // ==========================================
-        // UPDATED VERIFY ATTENDANCE FUNCTION WITH BETTER ERROR HANDLING
+        // UPDATED VERIFY ATTENDANCE FUNCTION WITH TIME VALIDATION
         // ==========================================
         async function verifyAttendance(action) {
             const div = document.getElementById("attendanceResult");
-
             div.style.display = "block";
             div.className = "result loading";
+
+            // ============ TIME WINDOWS ============
+            // Check-In:  7:30 AM - 8:10 AM
+            // Check-Out: 1:00 PM - 2:00 PM
+            // ======================================
+            const now = new Date();
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            const timeLabel = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+            let startMinutes, endMinutes, windowLabel, actionLabel;
+            if (action === 'check_in') {
+                startMinutes = 7 * 60 + 30;   // 07:30
+                endMinutes   = 8 * 60 + 10;   // 08:10
+                windowLabel  = '7:30 AM - 8:10 AM';
+                actionLabel  = 'Check-In';
+            } else {
+                startMinutes = 13 * 60;       // 13:00 (1:00 PM)
+                endMinutes   = 14 * 60;       // 14:00 (2:00 PM)
+                windowLabel  = '1:00 PM - 2:00 PM';
+                actionLabel  = 'Check-Out';
+            }
+
+            if (currentMinutes < startMinutes || currentMinutes > endMinutes) {
+                div.className = "result error";
+                div.innerHTML = `<strong>⚠️ Wrong Time!</strong> ${actionLabel} is only allowed between ${windowLabel}.<br>Current time: ${timeLabel}`;
+                return;
+            }
+
             div.innerHTML = "Getting GPS...";
 
             if (!navigator.geolocation) {
@@ -858,7 +885,7 @@
                     if (response.ok) {
                         if (data.verified) {
                             div.className = "result success";
-                            div.innerHTML = `✅ VERIFIED<br>Distance: ${data.distance} meters`;
+                            div.innerHTML = `✅ ${actionLabel.toUpperCase()} VERIFIED<br>Distance: ${data.distance} meters`;
                         } else {
                             div.className = "result error";
                             div.innerHTML = `❌ Not at assigned school.<br>Distance: ${data.distance} meters`;
