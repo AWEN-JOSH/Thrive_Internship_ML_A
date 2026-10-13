@@ -54,9 +54,15 @@
             <h2>My Profile (QR Status)</h2>
             <div class="form-row">
                 <div class="form-col">
-                    <input type="text" id="studentIdInput" placeholder="Enter Student ID (e.g., Kwame Mensah)">
+                    <label>Student ID</label>
+                    <input type="text" id="studentIdInput" placeholder="Enter Student ID (e.g., Kwame Abu)">
                 </div>
                 <div class="form-col">
+                    <label>Admin Password (Required for Admin)</label>
+                    <input type="password" id="adminPasswordInput" placeholder="Enter password if Admin">
+                </div>
+                <div class="form-col">
+                    <label>Semester</label>
                     <select id="semesterSelect">
                         <option value="1">Year One, Semester 1: STS: Beginning Teaching 1</option>
                         <option value="2">Year One, Semester 2: STS: Beginning Teaching 2</option>
@@ -73,12 +79,12 @@
             <div id="profileResult" class="result"></div>
         </div>
 
-        <!-- Admin Section -->
+        <!-- Admin Section - ONLY FOR esayat88 -->
         <div class="card no-print" id="adminSection" style="display:none; border: 2px solid #ff9900;">
-            <h2>👑 Administrator Dashboard (Kwame Mensah Only)</h2>
+            <h2>👑 Administrator Dashboard (esayat88 Only)</h2>
             
             <!-- Part 1: QR Code Generator -->
-            <h3>📱 Generate Student QR Code</h3>
+            <h3> Generate Student QR Code</h3>
             <div class="form-row">
                 <div class="form-col">
                     <input type="text" id="qrStudentId" placeholder="Enter Student ID to generate QR">
@@ -108,7 +114,6 @@
                 </div>
             </div>
             
-            <!-- College/University Field -->
             <div class="form-row">
                 <div class="form-col">
                     <label>College/University Attending *</label>
@@ -124,14 +129,14 @@
                 <div class="form-col">
                     <label>Current Semester</label>
                     <select id="enrollSemester">
-                        <option value="1">Year One, Semester 1: STS: Beginning Teaching 1</option>
-                        <option value="2">Year One, Semester 2: STS: Beginning Teaching 2</option>
-                        <option value="3">Year Two, Semester 1: STS: Developing Teaching 1</option>
-                        <option value="4">Year Two, Semester 2: STS: Developing Teaching 2</option>
-                        <option value="5">Year Three, Semester 1: STS: Embedding Teaching 1</option>
-                        <option value="6">Year Three, Semester 2: STS: Embedding Teaching 2</option>
-                        <option value="7">Year Four, Semester 1: STS: Extending Teaching (Internship)</option>
-                        <option value="8">Year Four, Semester 2: STS: Extending Teaching II</option>
+                        <option value="1">Year One, Semester 1</option>
+                        <option value="2">Year One, Semester 2</option>
+                        <option value="3">Year Two, Semester 1</option>
+                        <option value="4">Year Two, Semester 2</option>
+                        <option value="5">Year Three, Semester 1</option>
+                        <option value="6">Year Three, Semester 2</option>
+                        <option value="7">Year Four, Semester 1 (Internship)</option>
+                        <option value="8">Year Four, Semester 2</option>
                     </select>
                 </div>
                 <div class="form-col">
@@ -160,13 +165,13 @@
                     <input type="date" id="enrollExpiry" value="2026-12-31">
                 </div>
             </div>
-            <button onclick="enrollStudent()" style="background-color: #232f3e; width: 100%;">💾 Enroll Student into System</button>
+            <button onclick="enrollStudent()" style="background-color: #232f3e; width: 100%;"> Enroll Student into System</button>
             <div id="enrollResult" class="result" style="margin-top: 15px;"></div>
 
             <hr style="margin: 30px 0; border: 0; border-top: 1px solid #ccc;">
 
             <!-- Part 3: Register School GPS -->
-            <h3>📍 Register Practice School GPS</h3>
+            <h3> Register Practice School GPS</h3>
             <p style="color: #666; font-size: 14px;">Visit the school physically, click "Capture GPS", then save.</p>
             <div class="form-row">
                 <div class="form-col">
@@ -194,8 +199,8 @@
 
             <hr style="margin: 30px 0; border: 0; border-top: 1px solid #ccc;">
 
-            <!-- Part 4: Register New Coordinator (UPDATED FOR COLLEGE) -->
-            <h3>👨‍🏫 Register New Coordinator</h3>
+            <!-- Part 4: Register New Coordinator -->
+            <h3>👨‍ Register New Coordinator</h3>
             <p>Create coordinator account to monitor students from a specific college (valid for 1 year)</p>
             <div class="form-row">
                 <div class="form-col">
@@ -232,7 +237,7 @@
             <textarea id="mission_statement" rows="2" placeholder="Mission Statement"></textarea>
             <textarea id="vision_statement" rows="2" placeholder="Vision Statement"></textarea>
             <textarea id="core_values" rows="2" placeholder="Core Values (comma separated)"></textarea>
-            <textarea id="school_facilities" rows="3" placeholder="List of School Facilities (e.g., Library, Computer Lab, Science Lab, Sports Field, etc.)"></textarea>
+            <textarea id="school_facilities" rows="3" placeholder="List of School Facilities"></textarea>
 
             <h3>2. Teaching Staff Breakdown</h3>
             <div class="form-row">
@@ -270,19 +275,19 @@
             
             <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #2196F3;">
                 <h3 style="margin-top: 0; color: #1976D2;"> Daily Attendance Verification</h3>
-                <p>Click Check-In when you arrive at school (7:30 AM - 8:10 AM) and Check-Out when you leave (1:00 PM - 2:00 PM). GPS location will be verified.</p>
+                <p>Click Check-In when you arrive at school (8 AM) and Check-Out when you leave (1 PM). GPS location will be verified.</p>
                 <div class="form-row">
-                    <button onclick="verifyAttendance('check_in')" style="background:#28a745; flex:1; font-size: 16px; padding: 15px;">✅ CHECK IN (7:30 AM - 8:10 AM)</button>
-                    <button onclick="verifyAttendance('check_out')" style="background:#dc3545; flex:1; font-size: 16px; padding: 15px;"> CHECK OUT (1:00 PM - 2:00 PM)</button>
+                    <button onclick="verifyAttendance('check_in')" style="background:#28a745; flex:1; font-size: 16px; padding: 15px;">✅ CHECK IN (8 AM)</button>
+                    <button onclick="verifyAttendance('check_out')" style="background:#dc3545; flex:1; font-size: 16px; padding: 15px;"> CHECK OUT (1 PM)</button>
                 </div>
                 <div id="attendanceResult" class="result" style="margin-top:15px;"></div>
             </div>
 
             <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ffc107;">
-                <h3 style="margin-top: 0; color: #856404;">📸 11 AM Attendance Photo</h3>
+                <h3 style="margin-top: 0; color: #856404;"> 11 AM Attendance Photo</h3>
                 <p>At 10:30 AM to 12:00 PM, capture a selfie to confirm your presence at school.</p>
                 <button onclick="captureAttendancePhoto()" id="photoBtn" style="background: #ffc107; width: 100%; font-size: 18px; padding: 15px;">
-                    📷 Capture Attendance Photo (10:30 AM - 12:00 PM)
+                     Capture Attendance Photo (10:30 AM - 12:00 PM)
                 </button>
                 <div id="photoResult" class="result" style="margin-top: 15px;"></div>
                 <video id="camera" style="display: none; width: 100%; max-width: 400px; margin-top: 10px;" autoplay></video>
@@ -351,11 +356,14 @@
         const CAPTURE_ATTENDANCE_PHOTO_URL = 'https://6dfe6z75yohubbexchkohxs3ca0cerpc.lambda-url.us-east-1.on.aws/';
         const GET_COORDINATOR_DASHBOARD_URL = 'https://rb2wxcvtgxemegalw7vxqqw5qm0ggzbf.lambda-url.us-east-1.on.aws/';
 
-        const ADMIN_ID = 'Kwame Mensah';
+        // ADMIN ID is NOW set to esayat88
+        const ADMIN_ID = 'esayat88';
+        const ADMIN_PASSWORD = 'esayat88'; // The only password that grants admin access
+        
         let currentStudentId = null;
         let currentQRCode = null;
 
-        const defaultClasses = ["Creche", "KG 1", "KG 2", "Primary 1", "Primary 2", "Primary 3", "Primary 4", "Primary 5", "Primary 6", "JHS 1", "JHS 2", "JHS 3"];
+        const defaultClasses = ["Creche", "Nursery 1", "Nursery 2", "KG 1", "KG 2", "Basic 1", "Basic 2", "Basic 3", "Basic 4", "Basic 5", "Basic 6", "Basic 7 (JHS 1)", "Basic 8 (JHS 2)", "Basic 9 (JHS 3)"];
 
         function addClassRow(className = "", stream = "None", male = 0, female = 0) {
             const container = document.getElementById('enrollmentContainer');
@@ -380,8 +388,10 @@
 
         async function checkStudentStatus() {
             const studentId = document.getElementById('studentIdInput').value;
+            const password = document.getElementById('adminPasswordInput').value;
             const semester = document.getElementById('semesterSelect').value;
             const resultBox = document.getElementById('profileResult');
+            
             if (!studentId) { alert('Please enter Student ID'); return; }
 
             resultBox.style.display = 'block';
@@ -400,22 +410,32 @@
                     currentStudentId = studentId;
                     resultBox.className = 'result success';
                     resultBox.innerHTML = `<h3>✅ ${data.message}</h3><p>Name: ${data.student_name} | School: ${data.school_id} | Semester: ${semester}</p>`;
+                    
+                    // Show standard sections
                     document.getElementById('schoolProfileSection').style.display = 'block';
                     document.getElementById('srjSection').style.display = 'block';
                     document.getElementById('reportSection').style.display = 'block';
                     
+                    // ADMIN SECURITY CHECK - ONLY esayat88 CAN ACCESS
                     if (currentStudentId === ADMIN_ID) {
-                        document.getElementById('adminSection').style.display = 'block';
+                        if (password === ADMIN_PASSWORD) {
+                            document.getElementById('adminSection').style.display = 'block';
+                        } else {
+                            document.getElementById('adminSection').style.display = 'none';
+                            alert('⚠️ Incorrect Admin Password. Administrator dashboard access denied.');
+                        }
                     } else {
                         document.getElementById('adminSection').style.display = 'none';
                     }
                 } else {
                     resultBox.className = 'result error';
-                    resultBox.innerHTML = `<h3>❌ ${data.message}</h3>`;
+                    resultBox.innerHTML = `<h3> ${data.message}</h3>`;
+                    document.getElementById('adminSection').style.display = 'none';
                 }
             } catch (error) {
                 resultBox.className = 'result error';
                 resultBox.innerHTML = `<h3>🔌 Error</h3><p>${error.message}</p>`;
+                document.getElementById('adminSection').style.display = 'none';
             }
         }
 
@@ -527,8 +547,8 @@
                 
                 if (response.ok) {
                     resultBox.className = 'result success';
-                    let html = `<h3>📚 Semester ${semester} | Week ${week}, Day ${day}</h3>`;
-                    html += `<div class="srj-item"><h4>📝 Reflective Questions:</h4>`;
+                    let html = `<h3> Semester ${semester} | Week ${week}, Day ${day}</h3>`;
+                    html += `<div class="srj-item"><h4> Reflective Questions:</h4>`;
                     if (Array.isArray(data.srj_questions)) {
                         data.srj_questions.forEach((q, i) => {
                             html += `<div class="srj-question" style="margin-top:10px; font-weight:bold;">${i+1}. ${q}</div>`;
@@ -547,7 +567,7 @@
                     resultBox.innerHTML = html;
                 } else {
                     resultBox.className = 'result error';
-                    resultBox.innerHTML = `<h3>❌ Error</h3><p>${data.error}</p>`;
+                    resultBox.innerHTML = `<h3> Error</h3><p>${data.error}</p>`;
                 }
             } catch (error) {
                 resultBox.className = 'result error';
@@ -683,7 +703,7 @@
                     document.getElementById('enrollSchool').value = '';
                 } else {
                     resultDiv.className = 'result error';
-                    resultDiv.innerHTML = `<strong>❌ Error:</strong> ${result.error}`;
+                    resultDiv.innerHTML = `<strong> Error:</strong> ${result.error}`;
                 }
             } catch (error) {
                 resultDiv.className = 'result error';
@@ -798,7 +818,7 @@
                     resultDiv.innerHTML = `<strong>✅ Success!</strong> ${schoolData.school_name} registered with GPS.`;
                 } else {
                     resultDiv.className = 'result error';
-                    resultDiv.innerHTML = `<strong>❌ Error:</strong> ${result.error}`;
+                    resultDiv.innerHTML = `<strong> Error:</strong> ${result.error}`;
                 }
             } catch (error) {
                 resultDiv.className = 'result error';
@@ -806,41 +826,11 @@
             }
         }
 
-        // ==========================================
-        // UPDATED VERIFY ATTENDANCE FUNCTION WITH TIME VALIDATION
-        // ==========================================
         async function verifyAttendance(action) {
             const div = document.getElementById("attendanceResult");
+
             div.style.display = "block";
             div.className = "result loading";
-
-            // ============ TIME WINDOWS ============
-            // Check-In:  7:30 AM - 8:10 AM
-            // Check-Out: 1:00 PM - 2:00 PM
-            // ======================================
-            const now = new Date();
-            const currentMinutes = now.getHours() * 60 + now.getMinutes();
-            const timeLabel = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
-
-            let startMinutes, endMinutes, windowLabel, actionLabel;
-            if (action === 'check_in') {
-                startMinutes = 7 * 60 + 30;   // 07:30
-                endMinutes   = 8 * 60 + 10;   // 08:10
-                windowLabel  = '7:30 AM - 8:10 AM';
-                actionLabel  = 'Check-In';
-            } else {
-                startMinutes = 13 * 60;       // 13:00 (1:00 PM)
-                endMinutes   = 14 * 60;       // 14:00 (2:00 PM)
-                windowLabel  = '1:00 PM - 2:00 PM';
-                actionLabel  = 'Check-Out';
-            }
-
-            if (currentMinutes < startMinutes || currentMinutes > endMinutes) {
-                div.className = "result error";
-                div.innerHTML = `<strong>⚠️ Wrong Time!</strong> ${actionLabel} is only allowed between ${windowLabel}.<br>Current time: ${timeLabel}`;
-                return;
-            }
-
             div.innerHTML = "Getting GPS...";
 
             if (!navigator.geolocation) {
@@ -885,7 +875,7 @@
                     if (response.ok) {
                         if (data.verified) {
                             div.className = "result success";
-                            div.innerHTML = `✅ ${actionLabel.toUpperCase()} VERIFIED<br>Distance: ${data.distance} meters`;
+                            div.innerHTML = `✅ VERIFIED<br>Distance: ${data.distance} meters`;
                         } else {
                             div.className = "result error";
                             div.innerHTML = `❌ Not at assigned school.<br>Distance: ${data.distance} meters`;
@@ -911,9 +901,6 @@
             });
         }
 
-        // ==========================================
-        // IMPROVED CAPTURE ATTENDANCE PHOTO FUNCTION
-        // ==========================================
         async function captureAttendancePhoto() {
             const resultDiv = document.getElementById('photoResult');
             const video = document.getElementById('camera');
@@ -927,15 +914,13 @@
             const startMinutes = 10 * 60 + 30;  // 10:30 AM
             const endMinutes = 12 * 60;          // 12:00 PM
             
-            // Time validation
             if (currentMinutes < startMinutes || currentMinutes > endMinutes) {
                 resultDiv.style.display = 'block';
                 resultDiv.className = 'result error';
-                resultDiv.innerHTML = `<strong>⚠️ Wrong Time!</strong> Photo capture only allowed between 10:30 AM and 12:00 PM.<br>Current time: ${hour}:${minute.toString().padStart(2, '0')}`;
+                resultDiv.innerHTML = `<strong>️ Wrong Time!</strong> Photo capture only allowed between 10:30 AM and 12:00 PM.<br>Current time: ${hour}:${minute.toString().padStart(2, '0')}`;
                 return;
             }
 
-            // Show loading state
             photoBtn.disabled = true;
             photoBtn.textContent = '📷 Initializing camera...';
             resultDiv.style.display = 'block';
@@ -943,54 +928,39 @@
             resultDiv.innerHTML = '<p>📷 Initializing camera...</p>';
 
             try {
-                // Request camera access with timeout
                 const stream = await Promise.race([
                     navigator.mediaDevices.getUserMedia({ 
-                        video: { 
-                            facingMode: 'user',
-                            width: { ideal: 640 },
-                            height: { ideal: 480 }
-                        } 
+                        video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } 
                     }),
-                    new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error('Camera access timeout')), 10000)
-                    )
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('Camera access timeout')), 10000))
                 ]);
                 
                 video.style.display = 'block';
                 video.srcObject = stream;
                 
-                // Wait for video to be ready
                 await new Promise((resolve) => {
-                    video.onloadedmetadata = () => {
-                        video.play();
-                        resolve();
-                    };
+                    video.onloadedmetadata = () => { video.play(); resolve(); };
                 });
                 
                 photoBtn.textContent = 'Taking photo in 3 seconds...';
                 resultDiv.innerHTML = '<p>📸 Position yourself and smile! Photo will be taken in 3 seconds...</p>';
 
-                // Countdown
                 for (let i = 3; i > 0; i--) {
                     resultDiv.innerHTML += `<p>${i}...</p>`;
                     await new Promise(resolve => setTimeout(resolve, 1000));
                 }
 
-                // Capture photo
                 const context = canvas.getContext('2d');
                 canvas.width = video.videoWidth || 640;
                 canvas.height = video.videoHeight || 480;
                 context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                const photoData = canvas.toDataURL('image/jpeg', 0.8); // Compress to 80%
+                const photoData = canvas.toDataURL('image/jpeg', 0.8);
                 
-                // Stop camera
                 stream.getTracks().forEach(track => track.stop());
                 video.style.display = 'none';
                 
-                // Upload photo with timeout
                 resultDiv.className = 'result loading';
-                resultDiv.innerHTML = '<p>⏳ Uploading photo... Please wait...</p>';
+                resultDiv.innerHTML = '<p> Uploading photo... Please wait...</p>';
                 
                 const uploadPromise = fetch(CAPTURE_ATTENDANCE_PHOTO_URL, {
                     method: 'POST',
@@ -1026,9 +996,9 @@
                 
                 let errorMessage = '❌ <strong>Camera Error:</strong> ';
                 if (error.name === 'NotAllowedError' || error.message.includes('permission')) {
-                    errorMessage += 'Camera access denied. Please allow camera permissions in your browser settings.';
+                    errorMessage += 'Camera access denied. Please allow camera permissions.';
                 } else if (error.name === 'NotFoundError' || error.message.includes('device')) {
-                    errorMessage += 'No camera found. Please connect a camera and try again.';
+                    errorMessage += 'No camera found.';
                 } else if (error.message.includes('timeout')) {
                     errorMessage += error.message;
                 } else {
@@ -1037,11 +1007,8 @@
                 
                 resultDiv.innerHTML = errorMessage;
             } finally {
-                // Reset button
-                photoBtn.textContent = '📷 Capture Attendance Photo (10:30 AM - 12:00 PM)';
+                photoBtn.textContent = ' Capture Attendance Photo (10:30 AM - 12:00 PM)';
                 photoBtn.disabled = false;
-                
-                // Ensure video is stopped
                 if (video.srcObject) {
                     video.srcObject.getTracks().forEach(track => track.stop());
                 }
