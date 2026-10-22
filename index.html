@@ -55,7 +55,7 @@
             <div class="form-row">
                 <div class="form-col">
                     <label>Student ID</label>
-                    <input type="text" id="studentIdInput" placeholder="Enter Student ID (e.g., Kwame Abu)">
+                    <input type="text" id="studentIdInput" placeholder="e.g., esayat88">
                 </div>
                 <div class="form-col">
                     <label>Admin Password (Required for Admin)</label>
@@ -84,7 +84,7 @@
             <h2>👑 Administrator Dashboard (esayat88 Only)</h2>
             
             <!-- Part 1: QR Code Generator -->
-            <h3> Generate Student QR Code</h3>
+            <h3>📱 Generate Student QR Code</h3>
             <div class="form-row">
                 <div class="form-col">
                     <input type="text" id="qrStudentId" placeholder="Enter Student ID to generate QR">
@@ -165,13 +165,13 @@
                     <input type="date" id="enrollExpiry" value="2026-12-31">
                 </div>
             </div>
-            <button onclick="enrollStudent()" style="background-color: #232f3e; width: 100%;"> Enroll Student into System</button>
+            <button onclick="enrollStudent()" style="background-color: #232f3e; width: 100%;">💾 Enroll Student into System</button>
             <div id="enrollResult" class="result" style="margin-top: 15px;"></div>
 
             <hr style="margin: 30px 0; border: 0; border-top: 1px solid #ccc;">
 
             <!-- Part 3: Register School GPS -->
-            <h3> Register Practice School GPS</h3>
+            <h3>📍 Register Practice School GPS</h3>
             <p style="color: #666; font-size: 14px;">Visit the school physically, click "Capture GPS", then save.</p>
             <div class="form-row">
                 <div class="form-col">
@@ -193,14 +193,14 @@
                     <input type="number" step="any" id="regLong" placeholder="Auto-filled">
                 </div>
             </div>
-            <button onclick="captureGPS()" style="background:#17a2b8; width:100%;"> Capture My Current GPS (Do this at the school)</button>
+            <button onclick="captureGPS()" style="background:#17a2b8; width:100%;">📡 Capture My Current GPS (Do this at the school)</button>
             <button onclick="saveSchoolGPS()" style="background:#232f3e; width:100%; margin-top:10px;">💾 Save School to Registry</button>
             <div id="regResult" class="result" style="margin-top:15px;"></div>
 
             <hr style="margin: 30px 0; border: 0; border-top: 1px solid #ccc;">
 
             <!-- Part 4: Register New Coordinator -->
-            <h3>👨‍ Register New Coordinator</h3>
+            <h3>👨‍🏫 Register New Coordinator</h3>
             <p>Create coordinator account to monitor students from a specific college (valid for 1 year)</p>
             <div class="form-row">
                 <div class="form-col">
@@ -274,20 +274,20 @@
             <h2>Daily SRJ Log & GPS Attendance</h2>
             
             <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #2196F3;">
-                <h3 style="margin-top: 0; color: #1976D2;"> Daily Attendance Verification</h3>
+                <h3 style="margin-top: 0; color: #1976D2;">📍 Daily Attendance Verification</h3>
                 <p>Click Check-In when you arrive at school (8 AM) and Check-Out when you leave (1 PM). GPS location will be verified.</p>
                 <div class="form-row">
                     <button onclick="verifyAttendance('check_in')" style="background:#28a745; flex:1; font-size: 16px; padding: 15px;">✅ CHECK IN (8 AM)</button>
-                    <button onclick="verifyAttendance('check_out')" style="background:#dc3545; flex:1; font-size: 16px; padding: 15px;"> CHECK OUT (1 PM)</button>
+                    <button onclick="verifyAttendance('check_out')" style="background:#dc3545; flex:1; font-size: 16px; padding: 15px;">🚪 CHECK OUT (1 PM)</button>
                 </div>
                 <div id="attendanceResult" class="result" style="margin-top:15px;"></div>
             </div>
 
             <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ffc107;">
-                <h3 style="margin-top: 0; color: #856404;"> 11 AM Attendance Photo</h3>
+                <h3 style="margin-top: 0; color: #856404;">📸 11 AM Attendance Photo</h3>
                 <p>At 10:30 AM to 12:00 PM, capture a selfie to confirm your presence at school.</p>
                 <button onclick="captureAttendancePhoto()" id="photoBtn" style="background: #ffc107; width: 100%; font-size: 18px; padding: 15px;">
-                     Capture Attendance Photo (10:30 AM - 12:00 PM)
+                    📷 Capture Attendance Photo (10:30 AM - 12:00 PM)
                 </button>
                 <div id="photoResult" class="result" style="margin-top: 15px;"></div>
                 <video id="camera" style="display: none; width: 100%; max-width: 400px; margin-top: 10px;" autoplay></video>
@@ -321,7 +321,7 @@
 
         <!-- Generate Final Report Section -->
         <div class="card no-print" id="reportSection" style="display:none;">
-            <h2> Generate Final Internship Report</h2>
+            <h2>📄 Generate Final Internship Report</h2>
             <p>Click the button below to generate your comprehensive 5-Chapter internship report.</p>
             <button onclick="generateFinalReport()" class="large" style="background-color: #28a745; font-size: 20px;">📄 Generate Complete Report</button>
             <div id="reportStatus" class="result"></div>
@@ -429,7 +429,7 @@
                     }
                 } else {
                     resultBox.className = 'result error';
-                    resultBox.innerHTML = `<h3> ${data.message}</h3>`;
+                    resultBox.innerHTML = `<h3>❌ ${data.message}</h3>`;
                     document.getElementById('adminSection').style.display = 'none';
                 }
             } catch (error) {
@@ -522,7 +522,7 @@
                 }
             } catch (error) {
                 statusDiv.className = 'result error';
-                statusDiv.innerHTML = `<h3> Error</h3><p>${error.message}</p>`;
+                statusDiv.innerHTML = `<h3>🔌 Error</h3><p>${error.message}</p>`;
             }
         }
 
@@ -547,8 +547,8 @@
                 
                 if (response.ok) {
                     resultBox.className = 'result success';
-                    let html = `<h3> Semester ${semester} | Week ${week}, Day ${day}</h3>`;
-                    html += `<div class="srj-item"><h4> Reflective Questions:</h4>`;
+                    let html = `<h3>📚 Semester ${semester} | Week ${week}, Day ${day}</h3>`;
+                    html += `<div class="srj-item"><h4>📝 Reflective Questions:</h4>`;
                     if (Array.isArray(data.srj_questions)) {
                         data.srj_questions.forEach((q, i) => {
                             html += `<div class="srj-question" style="margin-top:10px; font-weight:bold;">${i+1}. ${q}</div>`;
@@ -567,7 +567,7 @@
                     resultBox.innerHTML = html;
                 } else {
                     resultBox.className = 'result error';
-                    resultBox.innerHTML = `<h3> Error</h3><p>${data.error}</p>`;
+                    resultBox.innerHTML = `<h3>❌ Error</h3><p>${data.error}</p>`;
                 }
             } catch (error) {
                 resultBox.className = 'result error';
@@ -703,7 +703,7 @@
                     document.getElementById('enrollSchool').value = '';
                 } else {
                     resultDiv.className = 'result error';
-                    resultDiv.innerHTML = `<strong> Error:</strong> ${result.error}`;
+                    resultDiv.innerHTML = `<strong>❌ Error:</strong> ${result.error}`;
                 }
             } catch (error) {
                 resultDiv.className = 'result error';
@@ -789,6 +789,9 @@
             );
         }
 
+        // ==========================================
+        // ROBUST SAVE SCHOOL GPS FUNCTION
+        // ==========================================
         async function saveSchoolGPS() {
             const schoolData = {
                 admin_id: ADMIN_ID,
@@ -804,6 +807,8 @@
             }
 
             const resultDiv = document.getElementById('regResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result loading';
             resultDiv.innerHTML = '<p>⏳ Saving school...</p>';
 
             try {
@@ -812,13 +817,24 @@
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(schoolData)
                 });
-                const result = await response.json();
+                
+                // Get response as text first to prevent JSON parse errors on access denied
+                const responseText = await response.text();
+                console.log('Raw server response:', responseText);
+                
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (parseError) {
+                    throw new Error('Server returned invalid response: ' + responseText);
+                }
+                
                 if (response.ok) {
                     resultDiv.className = 'result success';
                     resultDiv.innerHTML = `<strong>✅ Success!</strong> ${schoolData.school_name} registered with GPS.`;
                 } else {
                     resultDiv.className = 'result error';
-                    resultDiv.innerHTML = `<strong> Error:</strong> ${result.error}`;
+                    resultDiv.innerHTML = `<strong>❌ Error:</strong> ${result.error || 'Unknown error'}`;
                 }
             } catch (error) {
                 resultDiv.className = 'result error';
@@ -917,7 +933,7 @@
             if (currentMinutes < startMinutes || currentMinutes > endMinutes) {
                 resultDiv.style.display = 'block';
                 resultDiv.className = 'result error';
-                resultDiv.innerHTML = `<strong>️ Wrong Time!</strong> Photo capture only allowed between 10:30 AM and 12:00 PM.<br>Current time: ${hour}:${minute.toString().padStart(2, '0')}`;
+                resultDiv.innerHTML = `<strong>⚠️ Wrong Time!</strong> Photo capture only allowed between 10:30 AM and 12:00 PM.<br>Current time: ${hour}:${minute.toString().padStart(2, '0')}`;
                 return;
             }
 
@@ -960,7 +976,7 @@
                 video.style.display = 'none';
                 
                 resultDiv.className = 'result loading';
-                resultDiv.innerHTML = '<p> Uploading photo... Please wait...</p>';
+                resultDiv.innerHTML = '<p>⏳ Uploading photo... Please wait...</p>';
                 
                 const uploadPromise = fetch(CAPTURE_ATTENDANCE_PHOTO_URL, {
                     method: 'POST',
@@ -1007,7 +1023,7 @@
                 
                 resultDiv.innerHTML = errorMessage;
             } finally {
-                photoBtn.textContent = ' Capture Attendance Photo (10:30 AM - 12:00 PM)';
+                photoBtn.textContent = '📷 Capture Attendance Photo (10:30 AM - 12:00 PM)';
                 photoBtn.disabled = false;
                 if (video.srcObject) {
                     video.srcObject.getTracks().forEach(track => track.stop());
