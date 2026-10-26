@@ -149,6 +149,8 @@
                     </select>
                 </div>
             </div>
+            
+            <!-- FIX 1: Added Coordinator ID field to the enrollment form -->
             <div class="form-row">
                 <div class="form-col">
                     <label>Weekly Visit Day</label>
@@ -160,6 +162,12 @@
                         <option value="Friday">Friday</option>
                     </select>
                 </div>
+                <div class="form-col">
+                    <label>Coordinator ID *</label>
+                    <input type="text" id="enrollCoordinatorId" placeholder="e.g., coord_ucc" required>
+                </div>
+            </div>
+            <div class="form-row">
                 <div class="form-col">
                     <label>Expiry Date</label>
                     <input type="date" id="enrollExpiry" value="2026-12-31">
@@ -665,6 +673,7 @@
         }
 
         async function enrollStudent() {
+            // FIX 2: Added coordinator_id to the payload
             const studentData = {
                 admin_id: ADMIN_ID,
                 student_id: document.getElementById('enrollId').value,
@@ -674,11 +683,13 @@
                 semester: document.getElementById('enrollSemester').value,
                 year: document.getElementById('enrollYear').value,
                 visit_day: document.getElementById('enrollVisitDay').value,
-                expiry_date: document.getElementById('enrollExpiry').value
+                expiry_date: document.getElementById('enrollExpiry').value,
+                coordinator_id: document.getElementById('enrollCoordinatorId').value // <-- ADDED THIS LINE
             };
 
-            if (!studentData.student_id || !studentData.student_name || !studentData.college || !studentData.school_id) {
-                alert('Please fill in Student ID, Name, College, and Practice School!');
+            // FIX 3: Updated validation to require coordinator_id
+            if (!studentData.student_id || !studentData.student_name || !studentData.college || !studentData.school_id || !studentData.coordinator_id) {
+                alert('Please fill in Student ID, Name, College, Practice School, and Coordinator ID!');
                 return;
             }
 
@@ -701,6 +712,7 @@
                     document.getElementById('enrollName').value = '';
                     document.getElementById('enrollCollege').value = '';
                     document.getElementById('enrollSchool').value = '';
+                    document.getElementById('enrollCoordinatorId').value = ''; // Clear the new field
                 } else {
                     resultDiv.className = 'result error';
                     resultDiv.innerHTML = `<strong>❌ Error:</strong> ${result.error}`;
@@ -789,9 +801,6 @@
             );
         }
 
-        // ==========================================
-        // ROBUST SAVE SCHOOL GPS FUNCTION
-        // ==========================================
         async function saveSchoolGPS() {
             const schoolData = {
                 admin_id: ADMIN_ID,
@@ -818,7 +827,6 @@
                     body: JSON.stringify(schoolData)
                 });
                 
-                // Get response as text first to prevent JSON parse errors on access denied
                 const responseText = await response.text();
                 console.log('Raw server response:', responseText);
                 
